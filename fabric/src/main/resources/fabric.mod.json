@@ -13,6 +13,9 @@
   "entrypoints": {
     "main": [
       "kz.nursultan.naturaltrees.NaturalTrees"
+    ],
+    "modmenu": [
+      "kz.nursultan.naturaltrees.client.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -23,5 +26,8 @@
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=${java_version}"
+  },
+  "suggests": {
+    "modmenu": "*"
   }
 }

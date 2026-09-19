@@ -18,9 +18,10 @@ package kz.nursultan.naturaltrees.platform.services;
 import com.mojang.serialization.MapCodec;
 import java.util.function.Supplier;
 import kz.nursultan.naturaltrees.block.BranchBlock;
-import kz.nursultan.naturaltrees.block.BranchWood;
+import kz.nursultan.naturaltrees.felling.FellingSettings;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
@@ -41,7 +42,7 @@ public interface IPlatformHelper {
      * Creates a branch block. NeoForge returns a subclass that overrides the loader's extension methods for
      * stripping and flammability; Fabric returns the common class and uses its registries (spec 6.4).
      */
-    BranchBlock createBranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties);
+    BranchBlock createBranchBlock(Supplier<? extends Block> strippedVariant, BlockBehaviour.Properties properties);
 
     /**
      * Both placer type classes have a private constructor in vanilla (docs/assumptions.md). NeoForge makes
@@ -50,6 +51,9 @@ public interface IPlatformHelper {
     <P extends TrunkPlacer> TrunkPlacerType<P> createTrunkPlacerType(MapCodec<P> codec);
 
     <P extends FoliagePlacer> FoliagePlacerType<P> createFoliagePlacerType(MapCodec<P> codec);
+
+    /** The server's felling settings (spec 14.3), read the loader's way: NeoForge's config system, a file on Fabric. */
+    FellingSettings fellingSettings();
 
     /**
      * Gets the name of the current platform

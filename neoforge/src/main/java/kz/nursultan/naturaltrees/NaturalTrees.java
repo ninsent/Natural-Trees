@@ -17,6 +17,8 @@ package kz.nursultan.naturaltrees;
 
 import kz.nursultan.naturaltrees.block.BranchWood;
 import kz.nursultan.naturaltrees.command.NaturalTreesCommands;
+import kz.nursultan.naturaltrees.config.NeoForgeFellingConfig;
+import kz.nursultan.naturaltrees.felling.FellingManager;
 import kz.nursultan.naturaltrees.platform.NeoForgePlatformHelper;
 import kz.nursultan.naturaltrees.registry.ModBlocks;
 import net.minecraft.network.chat.Component;
@@ -27,17 +29,24 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @Mod(Constants.MOD_ID)
 public class NaturalTrees {
 
-    public NaturalTrees(IEventBus modBus) {
+    public NaturalTrees(IEventBus modBus, ModContainer container) {
         NeoForgePlatformHelper.setModBus(modBus);
         NaturalTreesCommon.init();
         modBus.addListener(NaturalTrees::addToCreativeTabs);
@@ -48,6 +57,18 @@ public class NaturalTrees {
                 PackType.SERVER_DATA, Component.translatable("pack.naturaltrees.worldgen"), PackSource.BUILT_IN,
                 false, Pack.Position.TOP));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> NaturalTreesCommands.register(event.getDispatcher()));
+
+        // Spec 14.3: built-in felling, off by default, configured through NeoForge's server configuration.
+        container.registerConfig(ModConfig.Type.SERVER, NeoForgeFellingConfig.SPEC);
+        NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> FellingManager.onServerStarted());
+        NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> FellingManager.onServerStopped());
+        NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> FellingManager.tick(event.getServer()));
+        // Last in line and only if nobody cancelled it; the felling itself starts a tick later, once the block is gone.
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, (BlockEvent.BreakEvent event) -> {
+            if (event.getLevel() instanceof net.minecraft.world.level.Level level) {
+                FellingManager.onBlockBroken(level, event.getPos(), event.getState(), event.getPlayer());
+            }
+        });
     }
 
     private static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {

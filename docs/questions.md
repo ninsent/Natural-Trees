@@ -195,3 +195,41 @@ own radius, and nothing is rounded up behind the author's back. The remedy is da
 shipped species in which even one tree of 1,000 has 30 leaves or fewer. **Proposed spec change:** a sentence in 9.2
 saying so, since a datapack author will meet it.
 
+### Q26–Q29 — gaps found while planning Phase 4
+
+*Decisions (delegated, 2026-09-19), details in `plan-phase-4.md`:*
+
+- **Q26, where the `felling.*` keys live.** NeoForge: a `ModConfigSpec` of type SERVER. Fabric: a small key = value file,
+  `config/naturaltrees-server.toml`, written with defaults on first start and read by the `fabric` module; no dependency.
+- **Q27, the "known felling mods" of 14.2.** `fallingtree`, `treechop`, `treeharvester`, by mod id; checked against the
+  real jars in test P4-3 before the list is final.
+- **Q28, when the felling search runs.** The break only queues it; the next server tick checks that the block is gone
+  and the player still holds an axe. One code path for both loaders; a cancelled break fells nothing.
+- **Q29, modded woods.** `BranchBlock` is made independent of the closed `BranchWood` enum so that an addon mod can
+  instantiate it. The Every Compat module adds a compile-only dependency on another mod and is **not** started
+  without the human's word; the agent first reports that mod's API and licence.
+
+### Q26–Q28 — answered by the human (2026-09-19)
+
+- **Q26.** *"There is a Mod Menu mod for Fabric. Our configs should be compatible with this mod."* Done: the Fabric
+  module has a `modmenu` entrypoint and a hand-written settings screen for the five `felling.*` keys, which edits
+  `config/naturaltrees-server.toml` and applies at once to a world open on the same computer. Mod Menu 11.0.4 (MIT)
+  is a compile-only reference and is put into the development client for testing; the published mod neither
+  requires nor bundles it, so "no runtime dependencies beyond the loaders" (spec section 4) still holds.
+  This brings the Fabric half of spec 22 item 4 (config screens) into version 1 at the human's request.
+  **Proposed spec change:** say so in section 16. NeoForge's native config screen (the other half of 22, item 4)
+  followed on the same day, when the human found the Config button of the NeoForge Mods screen greyed out: a
+  client-only `@Mod` class (`NaturalTreesClient`) registers NeoForge's own `ConfigurationScreen`, with labels
+  under `naturaltrees.configuration.*`. Server values are editable there while a world is open on the same computer.
+- **Q27.** Accepted: `fallingtree`, `treechop`, `treeharvester`, to be confirmed against the jars in test P4-3.
+- **Q28.** Delegated: the break queues the felling and the next server tick starts it, as planned.
+
+### Q30 — The mod id of guita's Branches (spec section 19)
+
+*Asked:* the agent needed that mod's id to disable the stacked-logs recipe when it is installed, as the risk table of
+spec section 19 says.
+*Answer (2026-09-19):* "You don't need to write compat with guita's Branches mod."
+*Decision:* no recipe condition, no detection of that mod. The stacked-logs recipe is unconditional. If both mods are
+installed and their recipes collide, the recipe manager picks one; that is accepted.
+**Proposed spec change:** in section 19, the row "The stacked-logs recipe collides with guita's Branches" changes
+its response from "Detect that mod and disable the recipe" to "Accepted; no special handling."

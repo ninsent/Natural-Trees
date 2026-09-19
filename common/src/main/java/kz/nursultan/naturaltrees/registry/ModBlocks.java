@@ -46,7 +46,8 @@ public final class ModBlocks {
             for (boolean stripped : new boolean[] {false, true}) {
                 final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, wood.branchId(stripped));
                 final Supplier<BranchBlock> block = Services.PLATFORM.register(BuiltInRegistries.BLOCK, id,
-                        () -> Services.PLATFORM.createBranchBlock(wood, stripped, BranchBlock.propertiesOf(wood, stripped)));
+                        () -> Services.PLATFORM.createBranchBlock(stripped ? null : () -> branch(wood, true),
+                                BranchBlock.propertiesOf(wood.log(stripped))));
                 final Supplier<Item> item = Services.PLATFORM.register(BuiltInRegistries.ITEM, id,
                         () -> new BlockItem(block.get(), new Item.Properties()));
                 (stripped ? STRIPPED : PLAIN).put(wood, block);

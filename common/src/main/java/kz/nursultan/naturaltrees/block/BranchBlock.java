@@ -16,7 +16,7 @@
 package kz.nursultan.naturaltrees.block;
 
 import java.util.Map;
-import kz.nursultan.naturaltrees.registry.ModBlocks;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -68,13 +68,16 @@ public class BranchBlock extends Block implements SimpleWaterloggedBlock {
     /** Shapes for the 64 arm masks; bit {@code i} is the arm toward {@code Direction.values()[i]}. */
     private static final VoxelShape[] SHAPES = buildShapes();
 
-    private final BranchWood wood;
-    private final boolean stripped;
+    private final Supplier<? extends Block> strippedVariant;
 
-    public BranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties) {
+    /**
+     * @param strippedVariant what an axe turns this branch into, itself a {@code BranchBlock}; null for a branch that
+     *        is already stripped. A supplier, because the two blocks of a wood are registered one after the other.
+     *        Nothing here knows this mod's own woods, so another mod can create branches for its wood the same way.
+     */
+    public BranchBlock(Supplier<? extends Block> strippedVariant, BlockBehaviour.Properties properties) {
         super(properties);
-        this.wood = wood;
-        this.stripped = stripped;
+        this.strippedVariant = strippedVariant;
         BlockState state = stateDefinition.any().setValue(WATERLOGGED, false);
         for (BooleanProperty arm : ARMS.values()) {
             state = state.setValue(arm, false);
@@ -83,11 +86,10 @@ public class BranchBlock extends Block implements SimpleWaterloggedBlock {
     }
 
     /**
-     * The properties of a branch: those of the wood's log (hardness, blast resistance, sound, instrument,
+     * The properties of a branch: those of its log (hardness, blast resistance, sound, instrument,
      * lava ignition), with the bark's map colour and without the full cube's occlusion.
      */
-    public static BlockBehaviour.Properties propertiesOf(BranchWood wood, boolean stripped) {
-        final Block log = wood.log(stripped);
+    public static BlockBehaviour.Properties propertiesOf(Block log) {
         // A log picks its map colour by axis; a branch has no axis, so it takes the colour of the log's side.
         final BlockState sideways = log.defaultBlockState().setValue(RotatedPillarBlock.AXIS, Direction.Axis.X);
         return BlockBehaviour.Properties.ofFullCopy(log)
@@ -98,12 +100,8 @@ public class BranchBlock extends Block implements SimpleWaterloggedBlock {
                 .isRedstoneConductor((state, level, pos) -> false);
     }
 
-    public BranchWood wood() {
-        return wood;
-    }
-
     public boolean isStripped() {
-        return stripped;
+        return strippedVariant == null;
     }
 
     /** The mask of a state's arms; bit {@code i} is the arm toward {@code Direction.values()[i]}. */
@@ -130,11 +128,11 @@ public class BranchBlock extends Block implements SimpleWaterloggedBlock {
      * or null when the block is already stripped. Each loader calls this from its own hook.
      */
     public static BlockState strippedState(BlockState state) {
-        if (!(state.getBlock() instanceof BranchBlock branch) || branch.stripped) {
+        if (!(state.getBlock() instanceof BranchBlock branch) || branch.strippedVariant == null
+                || !(branch.strippedVariant.get() instanceof BranchBlock target)) {
             return null;
         }
-        BlockState result = ModBlocks.branch(branch.wood, true).defaultBlockState()
-                .setValue(WATERLOGGED, state.getValue(WATERLOGGED));
+        final BlockState result = target.defaultBlockState().setValue(WATERLOGGED, state.getValue(WATERLOGGED));
         return withArmMask(result, armMask(state));
     }
 

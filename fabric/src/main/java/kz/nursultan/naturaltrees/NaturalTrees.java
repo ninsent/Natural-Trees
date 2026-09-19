@@ -18,9 +18,14 @@ package kz.nursultan.naturaltrees;
 import kz.nursultan.naturaltrees.block.BranchBlock;
 import kz.nursultan.naturaltrees.block.BranchWood;
 import kz.nursultan.naturaltrees.command.NaturalTreesCommands;
+import kz.nursultan.naturaltrees.config.FabricFellingConfig;
+import kz.nursultan.naturaltrees.felling.FellingManager;
 import kz.nursultan.naturaltrees.registry.ModBlocks;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -56,6 +61,17 @@ public class NaturalTrees implements ModInitializer {
     public void onInitialize() {
         NaturalTreesCommon.init();
         CommandRegistrationCallback.EVENT.register((dispatcher, registries, environment) -> NaturalTreesCommands.register(dispatcher));
+
+        // Spec 14.3: built-in felling, off by default. The settings file is read again whenever a server starts.
+        FabricFellingConfig.load();
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            FabricFellingConfig.load();
+            FellingManager.onServerStarted();
+        });
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> FellingManager.onServerStopped());
+        ServerTickEvents.END_SERVER_TICK.register(FellingManager::tick);
+        PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) ->
+                FellingManager.onBlockBroken(level, pos, state, player));
 
         // Spec 11.1: the world generation pack is optional and enabled by default. Fabric looks for it under
         // resourcepacks/<path> in the jar.

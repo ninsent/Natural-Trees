@@ -37,7 +37,7 @@ Last updated: 2026-09-19
   their judgement of the look, and the Modrinth and CurseForge name reservation. The far-chunk log search is step 1
   of `docs/measurements.md`.
 - When P2-1 passes, delete `docs/test-datapacks/phase-1` (Q21): the built-in pack replaces it.
-- **Phase 3, T1, T2 and T4 done, uncommitted.** Twelve new species files in `tools/viewer/.../species/` (spruce,
+- **Phase 3, T1, T2 and T4 done, committed (`669382e`).** Twelve new species files in `tools/viewer/.../species/` (spruce,
   pine, mega_spruce, mega_pine, acacia, cherry, jungle, mega_jungle, swamp_oak, mangrove, tall_mangrove, dark_oak),
   tuned by the agent with `dumpSpecies`; all 17 species pass the 1,000-seed budget test, which now reports every
   violation at once and also fails a species with even one near-leafless tree. The built-in pack holds 29 tree
@@ -46,6 +46,15 @@ Last updated: 2026-09-19
   `radius_tip`, high `trunk_foliage`), because boughs under 2 blocks are dropped (spec 7.3); a sleeve thinner than a
   block can yield no leaves (Q25). **Waiting for the human: P3-1 to P3-4** (`plan-phase-3.md`), above all the look
   of each species in game and the amount of jungle vines (Q22).
+- **Phase 4, T1–T5 and T7 done, uncommitted.** `felling` package in `common`: `FellingSettings`, `FellingSettingsFile`
+  (the Fabric file format), `WoodView`, `FellingSearch` (unit-tested on hand-built block sets), `FellingManager`
+  (queue on break, start next tick, paced jobs, other-felling-mod notice). NeoForge: `ModConfigSpec` SERVER config and
+  events. Fabric: `config/naturaltrees-server.toml`, events, and on the human's request (Q26) a Mod Menu settings
+  screen (`client/FellingConfigScreen`, `client/ModMenuIntegration`; Mod Menu is compile-only plus dev runtime).
+  NeoForge: the Config button of the Mods screen opens NeoForge's own configuration screen (`NaturalTreesClient`,
+  client-only). `BranchBlock` no longer knows the wood enum (`docs/addon-woods.md`). 84 tests pass.
+  **Waiting for the human:** P4-1 to P4-3, the Mod Menu screen check, and a yes or no on the Every Compat module (Q29).
+  Compatibility code for guita's Branches is not wanted (Q30, answered).
 - **Phase 0, T14 tuning.** Open until the human has judged the species in game.
 
 ## Blocked
@@ -54,8 +63,6 @@ Last updated: 2026-09-19
 
 ## Notes for future sessions
 
-- TODO(naturaltrees): spec section 19 wants the stacked-logs recipe disabled when guita's Branches is installed.
-  Not done; it needs loader-specific recipe conditions and belongs with the compatibility work of Phase 4.
 
 - **Never commit.** The human makes every commit; suggest commit points with files and a message.
 - The human delegates spec-gap and small technical decisions: decide, record in `docs/questions.md`, continue.

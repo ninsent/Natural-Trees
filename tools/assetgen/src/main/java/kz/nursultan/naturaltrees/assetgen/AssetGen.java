@@ -193,6 +193,31 @@ public final class AssetGen {
         write("data/naturaltrees/tags/item/branches.json", tag(allBranches));
         write("data/minecraft/tags/block/overworld_natural_logs.json", tag(plainBranches));
         lang.add("  \"pack.naturaltrees.worldgen\": \"Natural Trees world generation\"");
+        String[][] config = {
+            {"title", "Natural Trees: tree felling"},
+            {"enabled", "Built-in tree felling"},
+            {"enabled.tooltip", "With an axe, not sneaking, breaking a log or a branch fells the tree above it. Off by default."},
+            {"force", "Keep it on beside another felling mod"},
+            {"force.tooltip", "Stay enabled when another tree-felling mod is installed."},
+            {"max_blocks", "Most wood blocks in one felling"},
+            {"max_blocks.tooltip", "Hard cap on one felling, 1 to 4096."},
+            {"min_leaves", "Natural leaves the wood must touch"},
+            {"min_leaves.tooltip", "Leaves placed by a player do not count, so builds are never felled. 0 to 64."},
+            {"blocks_per_tick", "Wood blocks broken per tick"},
+            {"blocks_per_tick.tooltip", "Pacing, 1 to 256."},
+            {"note", "Applies to worlds opened on this computer. A dedicated server has its own file."}};
+        for (String[] entry : config) {
+            lang.add("  \"naturaltrees.config." + entry[0] + "\": \"" + entry[1] + "\"");
+            // NeoForge's own configuration screen looks its labels up as <modid>.configuration.<key>.
+            if (!entry[0].equals("title") && !entry[0].equals("note")) {
+                lang.add("  \"naturaltrees.configuration." + entry[0] + "\": \"" + entry[1] + "\"");
+            }
+        }
+        lang.add("  \"naturaltrees.configuration.title\": \"Natural Trees\"");
+        lang.add("  \"naturaltrees.configuration.felling\": \"Tree felling\"");
+        lang.add("  \"naturaltrees.configuration.felling.tooltip\": \"Built-in tree felling. Off by default.\"");
+        lang.add("  \"naturaltrees.configuration.section.naturaltrees.server.toml\": \"Server settings\"");
+        lang.add("  \"naturaltrees.configuration.section.naturaltrees.server.toml.title\": \"Natural Trees: server settings\"");
         write("assets/naturaltrees/lang/en_us.json", lang.toString());
     }
 }

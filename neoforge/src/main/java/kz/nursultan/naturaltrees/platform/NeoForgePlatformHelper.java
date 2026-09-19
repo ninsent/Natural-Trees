@@ -21,12 +21,14 @@ import java.util.Map;
 import java.util.function.Supplier;
 import kz.nursultan.naturaltrees.Constants;
 import kz.nursultan.naturaltrees.block.BranchBlock;
-import kz.nursultan.naturaltrees.block.BranchWood;
 import kz.nursultan.naturaltrees.block.NeoForgeBranchBlock;
+import kz.nursultan.naturaltrees.config.NeoForgeFellingConfig;
+import kz.nursultan.naturaltrees.felling.FellingSettings;
 import kz.nursultan.naturaltrees.platform.services.IPlatformHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
@@ -74,8 +76,8 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public BranchBlock createBranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties) {
-        return new NeoForgeBranchBlock(wood, stripped, properties);
+    public BranchBlock createBranchBlock(Supplier<? extends Block> strippedVariant, BlockBehaviour.Properties properties) {
+        return new NeoForgeBranchBlock(strippedVariant, properties);
     }
 
     // NeoForge makes both constructors public.
@@ -87,5 +89,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public <P extends FoliagePlacer> FoliagePlacerType<P> createFoliagePlacerType(MapCodec<P> codec) {
         return new FoliagePlacerType<>(codec);
+    }
+
+    @Override
+    public FellingSettings fellingSettings() {
+        return NeoForgeFellingConfig.get();
     }
 }

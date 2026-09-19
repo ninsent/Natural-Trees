@@ -15,10 +15,12 @@
  */
 package kz.nursultan.naturaltrees.block;
 
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.ItemAbilities;
@@ -31,8 +33,8 @@ public class NeoForgeBranchBlock extends BranchBlock {
     private static final int LOG_IGNITE_ODDS = 5;
     private static final int LOG_BURN_ODDS = 5;
 
-    public NeoForgeBranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties) {
-        super(wood, stripped, properties);
+    public NeoForgeBranchBlock(Supplier<? extends Block> strippedVariant, BlockBehaviour.Properties properties) {
+        super(strippedVariant, properties);
     }
 
     @Override

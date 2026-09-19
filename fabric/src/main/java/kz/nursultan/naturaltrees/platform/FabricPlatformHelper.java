@@ -18,13 +18,15 @@ package kz.nursultan.naturaltrees.platform;
 import com.mojang.serialization.MapCodec;
 import java.util.function.Supplier;
 import kz.nursultan.naturaltrees.block.BranchBlock;
-import kz.nursultan.naturaltrees.block.BranchWood;
+import kz.nursultan.naturaltrees.config.FabricFellingConfig;
+import kz.nursultan.naturaltrees.felling.FellingSettings;
 import kz.nursultan.naturaltrees.mixin.FoliagePlacerTypeInvoker;
 import kz.nursultan.naturaltrees.mixin.TrunkPlacerTypeInvoker;
 import kz.nursultan.naturaltrees.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
@@ -55,8 +57,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public BranchBlock createBranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties) {
-        return new BranchBlock(wood, stripped, properties);
+    public BranchBlock createBranchBlock(Supplier<? extends Block> strippedVariant, BlockBehaviour.Properties properties) {
+        return new BranchBlock(strippedVariant, properties);
     }
 
     @Override
@@ -67,5 +69,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public <P extends FoliagePlacer> FoliagePlacerType<P> createFoliagePlacerType(MapCodec<P> codec) {
         return FoliagePlacerTypeInvoker.naturaltrees$create(codec);
+    }
+
+    @Override
+    public FellingSettings fellingSettings() {
+        return FabricFellingConfig.get();
     }
 }

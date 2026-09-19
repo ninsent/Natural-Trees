@@ -24,6 +24,15 @@ still use vanilla trees.
 - **Commands** (permission level 2): `/naturaltrees place <feature> [seed]`, `/naturaltrees grid <feature> <n>`,
   `/naturaltrees stats <feature> [seeds]`.
 
+### Tree felling
+
+Off by default: cut the trunk and the limbs stay in the air, as a vanilla fancy oak's do. With
+`felling.enabled = true`, breaking a log or a branch with an axe while not sneaking fells the tree above the cut,
+following the tree's own structure, a few blocks per tick, one durability per block. Player-placed leaves do not
+count, so builds are never felled. NeoForge: the mod's server config file. Fabric: `config/naturaltrees-server.toml`,
+or the settings screen in Mod Menu if you have it. If another tree-felling mod is installed, the built-in one stays
+off unless `felling.force` is set.
+
 ### Turning the trees off
 
 The datapack is optional and enabled by default. Untick it on the Create World screen, or run
