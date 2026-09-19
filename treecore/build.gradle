@@ -23,6 +23,20 @@ tasks.withType(JavaCompile).configureEach {
 
 test {
     useJUnitPlatform()
+    systemProperty 'java.awt.headless', 'true'
+    systemProperty 'naturaltrees.printGolden', System.getProperty('naturaltrees.printGolden', 'false')
+}
+
+// Test helper: draws generated trees to PNG files in build/tree-dumps.
+// ./gradlew :treecore:dumpTrees -Pspecies=oak -Pseeds=8 -Pheight=9
+tasks.register('dumpTrees', JavaExec) {
+    group = 'verification'
+    description = 'Draws generated trees to PNG files, for inspecting the generator without the game.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kz.nursultan.naturaltrees.treecore.TreeDump'
+    systemProperty 'java.awt.headless', 'true'
+    args = [project.findProperty('species') ?: 'oak', project.findProperty('seeds') ?: '6',
+            project.findProperty('height') ?: '9', layout.buildDirectory.dir('tree-dumps').get().asFile.path]
 }
 
 // The loader projects compile these sources into their own jars, exactly as they do with ':common',
