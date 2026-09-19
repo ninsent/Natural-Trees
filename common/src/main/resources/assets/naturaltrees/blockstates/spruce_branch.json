@@ -1,0 +1,22 @@
+{
+  "multipart": [
+    { "when": { "north": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_arm" } },
+    { "when": { "north": "false", "east": "false", "south": "true", "west": "false", "up": "false", "down": "false" }, "apply": { "model": "naturaltrees:block/spruce_branch_core_end" } },
+    { "when": { "AND": [ { "north": "false" }, { "OR": [ { "south": "false" }, { "east": "true" }, { "west": "true" }, { "up": "true" }, { "down": "true" } ] } ] }, "apply": { "model": "naturaltrees:block/spruce_branch_core_side" } },
+    { "when": { "east": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_arm", "y": 90 } },
+    { "when": { "north": "false", "east": "false", "south": "false", "west": "true", "up": "false", "down": "false" }, "apply": { "model": "naturaltrees:block/spruce_branch_core_end", "y": 90 } },
+    { "when": { "AND": [ { "east": "false" }, { "OR": [ { "west": "false" }, { "north": "true" }, { "south": "true" }, { "up": "true" }, { "down": "true" } ] } ] }, "apply": { "model": "naturaltrees:block/spruce_branch_core_side", "y": 90 } },
+    { "when": { "south": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_arm", "y": 180 } },
+    { "when": { "north": "true", "east": "false", "south": "false", "west": "false", "up": "false", "down": "false" }, "apply": { "model": "naturaltrees:block/spruce_branch_core_end", "y": 180 } },
+    { "when": { "AND": [ { "south": "false" }, { "OR": [ { "north": "false" }, { "east": "true" }, { "west": "true" }, { "up": "true" }, { "down": "true" } ] } ] }, "apply": { "model": "naturaltrees:block/spruce_branch_core_side", "y": 180 } },
+    { "when": { "west": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_arm", "y": 270 } },
+    { "when": { "north": "false", "east": "true", "south": "false", "west": "false", "up": "false", "down": "false" }, "apply": { "model": "naturaltrees:block/spruce_branch_core_end", "y": 270 } },
+    { "when": { "AND": [ { "west": "false" }, { "OR": [ { "east": "false" }, { "north": "true" }, { "south": "true" }, { "up": "true" }, { "down": "true" } ] } ] }, "apply": { "model": "naturaltrees:block/spruce_branch_core_side", "y": 270 } },
+    { "when": { "up": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_arm", "x": 270 } },
+    { "when": { "north": "false", "east": "false", "south": "false", "west": "false", "up": "false", "down": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_core_end", "x": 270 } },
+    { "when": { "AND": [ { "up": "false" }, { "OR": [ { "down": "false" }, { "north": "true" }, { "east": "true" }, { "south": "true" }, { "west": "true" } ] } ] }, "apply": { "model": "naturaltrees:block/spruce_branch_core_side", "x": 270 } },
+    { "when": { "down": "true" }, "apply": { "model": "naturaltrees:block/spruce_branch_arm", "x": 90 } },
+    { "when": { "north": "false", "east": "false", "south": "false", "west": "false", "up": "true", "down": "false" }, "apply": { "model": "naturaltrees:block/spruce_branch_core_end", "x": 90 } },
+    { "when": { "AND": [ { "down": "false" }, { "OR": [ { "up": "false" }, { "north": "true" }, { "east": "true" }, { "south": "true" }, { "west": "true" } ] } ] }, "apply": { "model": "naturaltrees:block/spruce_branch_core_side", "x": 90 } }
+  ]
+}

@@ -117,3 +117,39 @@ in the paper's formulas is this `h − 1`.
   itself with a use-on-block callback and the flammable-block registry.
 - **Q15, fuel (spec 6.5).** NeoForge's `neoforge:furnace_fuels` data map and Fabric's `FuelRegistry`.
 
+### Q16 — Where the log textures are bound (spec 6.3)
+
+*Asked:* spec 6.3 says each wood's **blockstate** binds `#side` and `#end`. Vanilla blockstate files cannot bind
+textures; only models can.
+*Decision (delegated, 2026-09-19):* the two hand-authored models stay as the spec says (`branch_core`, `branch_arm`,
+textures only through `#side` and `#end`). Each wood gets two tiny child models that do nothing but bind those
+two variables to its `log` and `log_top` textures, and the blockstate points at the children. The intent of 6.3
+holds: no textures are added, and a resource pack that retextures logs retextures branches. A further
+hand-authored model, `branch_inventory` (a core with an up and a down arm), is the item icon.
+
+*Changed on the human's feedback from manual test P1-2 (2026-09-19):* a broken-off branch showed bark on its cut
+end, because `updateShape` clears the arm (6.4) and the core had bark on every face. The core is now two
+hand-authored face models, `branch_core_side` (bark) and `branch_core_end` (the log's end texture). A core face
+is drawn only where no arm covers it, and it shows the end grain when the branch is a stub: exactly one arm, on
+the opposite side. Elbows and junctions keep bark on their outer faces. The blockstate logic is checked for all
+64 arm masks (exactly one model per face). So the hand-authored models are four, not the two of spec 6.3.
+**Proposed spec change:** in 6.3, "blockstate binds them" becomes "child models bind them", and "two hand-authored
+models" becomes the four named above, with the rule for the end grain.
+
+### Q17 — Which placer fields are optional (spec 8.2)
+
+*Asked:* the top-level table of 8.2 has a Default column, but the tables for `trunk` and for each entry of `levels`
+have none, so read literally every one of their fields is required, including the many that are 0 in every species.
+*Decision (delegated, 2026-09-19):* in `trunk` and in a level, `curve_res` is required, and so are a level's
+`branches`, `length`, `down_angle` and `rotate`; `curve`, `curve_back`, `curve_v`, `seg_splits`, `split_angle`,
+`split_angle_v`, `base_splits`, `length_v`, `down_angle_v` and `rotate_v` default to 0 and `tip_radius_offset` to 0.
+The game's codecs (`ParamCodecs`) and the viewer (`PlacerJson`) apply the same rule, so a file means the same in both.
+**Proposed spec change:** add a Default column to those two tables.
+
+### Q18 — `/naturaltrees grid`: which seeds, how far apart (spec 16)
+
+*Decision (delegated):* seeds 1 to `n` (at most 32), in a row toward +x, each tree on the ground of its own column.
+Trees are `2 × (max_radius + foliage_margin) + 2` blocks apart when the feature uses the mod's trunk placer, so crowns
+never touch, and 34 otherwise. Positions in unloaded chunks are skipped and counted in the message. `place` without a
+seed draws one and prints it, so any tree can be placed again.
+

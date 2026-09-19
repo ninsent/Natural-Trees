@@ -1,0 +1,7 @@
+{
+  "parent": "naturaltrees:block/branch_arm",
+  "textures": {
+    "side": "minecraft:block/stripped_acacia_log",
+    "end": "minecraft:block/stripped_acacia_log_top"
+  }
+}

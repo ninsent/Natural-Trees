@@ -4,8 +4,10 @@ Spec section 18, Phase 1: the branch block with states, models, shapes, tags, lo
 flammability, shears, stripping and waterlogging, on both loaders; both placer types and the foliage handoff,
 on both loaders; `/naturaltrees place` and `grid`; the name and slug reserved on Modrinth and CurseForge.
 
-**Status: waiting for approval.** No Phase 1 code exists. Phase 0's exit criteria that need the human's eyes
-(manual tests P0-2 and P0-3) are still open; tuning can go on beside Phase 1, because species are data.
+**Status: approved 2026-09-19, in progress.** Done: T1–T9. P1-1 to P1-4 passed (the human, 2026-09-19; the cut end
+of a branch got end grain on their feedback, Q16). Waiting for the human: manual tests P1-5 to P1-8, written out
+in full at the end of this file. Phase 0's manual tests P0-2 and P0-3 are still open; tuning can go on beside
+Phase 1, because species are data.
 
 ## Exit criteria (spec 18)
 
@@ -71,3 +73,54 @@ P1-8 — no far-chunk writes            Fabric, with a pre-generation mod in the
 
 The built-in datapack and placed-feature counts (Phase 2), `/naturaltrees stats`, felling and its config
 (Phase 4), modded woods, anything in spec section 22.
+
+## P1-5 to P1-8 in full
+
+Before them: copy `docs/test-datapacks/phase-1` into the test world's `datapacks` folder (its README says how),
+and check `/datapack list`. Run each test on both clients unless it says otherwise.
+
+```
+Manual test P1-5 — a placed tree
+1. Creative, superflat world with the test datapack. Stand on open ground.
+2. /naturaltrees place minecraft:oak 1      then walk 20 blocks and run the same command again.
+3. Expect: two identical trees (same limbs, same leaves), made of oak logs, oak branch blocks with arms joining
+   them, and oak leaves. The chat line names the seed. No branch arm points at air; no floating wood or leaves.
+4. /naturaltrees grid minecraft:fancy_oak 8   and   /naturaltrees grid minecraft:birch 8
+5. Expect: rows of eight different trees that look like the viewer's fancy oaks and birches. Birch tops end in a
+   thin leader of branch blocks.
+6. /naturaltrees place minecraft:oak   (no seed) prints a seed; placing again with that seed elsewhere repeats it.
+7. Send back: screenshots of both rows, and any log line with "naturaltrees" at WARN or ERROR.
+
+Manual test P1-6 — obstruction, water, other placers
+1. Build a stone wall 2 blocks from where you stand and a stone roof 6 blocks up; /naturaltrees place minecraft:fancy_oak 3
+2. Expect: limbs stop at the wall and under the roof; nothing passes through stone; nothing floats; leaves only
+   where wood reached.
+3. Place a tree with its base in 2-block-deep water. Expect: branch blocks under water are waterlogged (no air
+   pockets), logs replace the water.
+4. Optional, for spec 9.1 and 9.3: ask me for two extra test features (the skeleton foliage on a vanilla straight
+   trunk, and the mod's trunk with vanilla blob foliage) if you want to see the fallbacks.
+5. Send back: screenshots.
+
+Manual test P1-7 — leaves persist (spec 18 exit criterion)
+1. Survival-like conditions in creative: plant oak and birch saplings on grass with 7+ blocks of free space, bone meal
+   them until they grow. Expect: the mod's trees, not vanilla's; a sapling against a wall grows a lopsided tree.
+2. /gamerule randomTickSpeed 300, wait two minutes (many in-game days of leaf ticks), then set it back to 3.
+3. Expect: no leaf has decayed, on the sapling trees and on the /naturaltrees place trees.
+4. Cut one limb off at the trunk (break its first branch block). Expect: that limb's leaves decay within a minute at
+   randomTickSpeed 300, unless another limb's wood is within reach; the rest of the crown stays.
+5. Bee nests: place /naturaltrees grid minecraft:oak_bees_005 16 near flowers. Expect: a few nests, each beside a log
+   or a branch, none floating.
+6. Send back: screenshots before and after step 2, and of a bee nest.
+
+Manual test P1-8 — no far-chunk writes (Fabric only; spec 18 exit criterion)
+1. Put a pre-generation mod for Fabric 1.21.1 (for example Chunky) into fabric/runs/client/mods. It is a test tool only.
+2. New world, default generation, with the test datapack added on the Create World screen (Data Packs) so that
+   the very first chunks use it. A forest-heavy seed helps.
+3. Pre-generate about 1,000 chunks: with Chunky, /chunky radius 250 then /chunky start, and wait for it to finish.
+4. Search fabric/runs/client/logs/latest.log for "Detected setBlock in a far chunk" and for "naturaltrees".
+5. Expect: no far-chunk line at all, and no WARN or ERROR from naturaltrees (one margin warning per species would
+   mean a species file needs a larger foliage_margin; tell me which).
+6. Fly through the forests. Expect: trees cut cleanly at nothing; crowns whole; mixed oak and birch forests.
+7. Send back: the two search results, and a few screenshots of forests.
+```
+

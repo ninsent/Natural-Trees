@@ -36,6 +36,8 @@ rootProject.name = 'Natural-Trees'
 include('treecore')
 // Developer tuning tool (spec 17). Not part of any mod jar.
 include('tools:viewer')
+// Writes the repetitive resource files of the branch blocks; its output is checked in.
+include('tools:assetgen')
 include('common')
 include('fabric')
 include('neoforge')

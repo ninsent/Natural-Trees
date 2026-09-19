@@ -65,10 +65,39 @@ final class FoliageBuilder {
         worldReads = 0;
 
         collectCandidates(skeleton, wood, params);
+        finish(params, wood.woodX, wood.woodY, wood.woodZ, wood.woodCount);
+    }
+
+    private static final int[] ORIGIN = {0};
+
+    /**
+     * Spec 9.1, the fallback for an attachment that does not belong to the handoff: steps 3 to 7 around the
+     * single wood voxel at the origin, with radius {@code radius_tip}. The voxel itself is not output.
+     */
+    void buildCluster(FoliageParams params, VoxelMap map, PlacementLimits limits, WorldRead world, long seed) {
+        this.map = map;
+        this.limits = limits;
+        this.world = world;
+        this.seed = seed;
+        leafCount = 0;
+        candidateCount = 0;
+        discardedByShade = 0;
+        discardedByReach = 0;
+        discardedByBudget = 0;
+        worldReads = 0;
+
+        map.content[VoxelMap.index(0, 0, 0)] = VoxelMap.LOG_Y;
+        map.touch(0);
+        final double r = params.radiusTip();
+        ellipsoid(0, 0, 0, r, r * params.flatten(), params.lift() * r);
+        finish(params, ORIGIN, ORIGIN, ORIGIN, 1);
+    }
+
+    private void finish(FoliageParams params, int[] woodX, int[] woodY, int[] woodZ, int woodCount) {
         thinAndTest(params);
         candidates = candidateCount;
         shade(params);
-        reach(wood, params);
+        reach(params, woodX, woodY, woodZ, woodCount);
         applyBudget(params);
     }
 
@@ -202,14 +231,14 @@ final class FoliageBuilder {
     }
 
     /** Step 6: breadth-first from all wood through kept candidates across faces, vanilla's leaf metric. */
-    private void reach(WoodBuilder wood, FoliageParams params) {
-        final int needed = wood.woodCount + candidateCount;
+    private void reach(FoliageParams params, int[] woodX, int[] woodY, int[] woodZ, int woodCount) {
+        final int needed = woodCount + candidateCount;
         if (queue.length < needed) {
             queue = new int[StrictMath.max(needed, queue.length * 2)];
         }
         int head = 0, tail = 0;
-        for (int i = 0; i < wood.woodCount; i++) {
-            queue[tail++] = VoxelMap.index(wood.woodX[i], wood.woodY[i], wood.woodZ[i]);
+        for (int i = 0; i < woodCount; i++) {
+            queue[tail++] = VoxelMap.index(woodX[i], woodY[i], woodZ[i]);
         }
         final int maxDistance = params.maxDistance();
         while (head < tail) {

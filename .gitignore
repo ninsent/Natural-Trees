@@ -25,3 +25,6 @@ runs
 
 # The Weber & Penn paper is copyrighted: keep the PDF out of version control (DOI 10.1145/218380.218427)
 docs/weber-penn-1995.pdf
+
+# Minecraft writes a logs folder when unit tests bootstrap it
+logs/

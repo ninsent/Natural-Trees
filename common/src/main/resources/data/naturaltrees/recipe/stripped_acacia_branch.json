@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "branches",
+  "key": { "#": { "item": "minecraft:stripped_acacia_log" } },
+  "pattern": [ "#", "#" ],
+  "result": { "count": 4, "id": "naturaltrees:stripped_acacia_branch" }
+}

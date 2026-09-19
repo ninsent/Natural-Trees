@@ -1,0 +1,18 @@
+// Writes the repetitive per-wood resource files of the branch blocks (spec section 6) into common's resources.
+// Its output is checked in; run it again only when the wood list or a file format changes:
+//   ./gradlew :tools:assetgen:run
+plugins {
+    id 'application'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+}
+
+application {
+    mainClass = 'kz.nursultan.naturaltrees.assetgen.AssetGen'
+}
+
+run {
+    args = [rootProject.file('common/src/main/resources').path]
+}

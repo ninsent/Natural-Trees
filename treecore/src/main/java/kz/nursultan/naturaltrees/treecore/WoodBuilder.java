@@ -128,6 +128,18 @@ final class WoodBuilder {
         }
     }
 
+    /** Empties the output, for a result that holds leaves only (the fallback cluster of spec 9.1). */
+    void clear() {
+        woodCount = 0;
+        pathCount = 0;
+        tipCount = 0;
+        truncatedStems = 0;
+        droppedByFace = 0;
+        droppedWithParent = 0;
+        worldReads = 0;
+        wideTrunkBlocked = false;
+    }
+
     // ---- Thickness: the pipe model, spec 7.2 --------------------------------------------------------
 
     /** Radius in blocks of a stem that carries {@code load} tips. */

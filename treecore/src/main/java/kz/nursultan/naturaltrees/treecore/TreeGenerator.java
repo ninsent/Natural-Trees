@@ -55,4 +55,18 @@ public final class TreeGenerator {
         result.set(skeleton, wood, foliageParams != null ? foliage : null, map);
         return result;
     }
+
+    /**
+     * The fallback cluster of spec 9.1: the foliage of one wood voxel, for a species that pairs the skeleton
+     * foliage placer with another trunk placer. Coordinates are relative to that voxel, which is taken to
+     * exist and is not part of the result; the result holds leaves only.
+     */
+    public TreeResult generateCluster(FoliageParams foliageParams, long seed, PlacementLimits limits,
+                                      WorldRead canLeafWorld) {
+        map.clear();
+        wood.clear();
+        foliage.buildCluster(foliageParams, map, limits, canLeafWorld, seed);
+        result.set(skeleton, wood, foliage, map);
+        return result;
+    }
 }

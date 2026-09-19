@@ -16,6 +16,8 @@
 package kz.nursultan.naturaltrees;
 
 import kz.nursultan.naturaltrees.platform.Services;
+import kz.nursultan.naturaltrees.registry.ModBlocks;
+import kz.nursultan.naturaltrees.registry.ModPlacers;
 
 /**
  * Loader-independent entry point. Each loader's main class calls {@link #init()} once.
@@ -26,6 +28,8 @@ public final class NaturalTreesCommon {
     }
 
     public static void init() {
+        ModBlocks.register();
+        ModPlacers.register();
         Constants.LOG.info("{} ({}) initialised on {} in a {} environment", Constants.MOD_NAME, Constants.MOD_ID,
                 Services.PLATFORM.getPlatformName(), Services.PLATFORM.getEnvironmentName());
     }

@@ -15,8 +15,21 @@
  */
 package kz.nursultan.naturaltrees.platform;
 
+import com.mojang.serialization.MapCodec;
+import java.util.function.Supplier;
+import kz.nursultan.naturaltrees.block.BranchBlock;
+import kz.nursultan.naturaltrees.block.BranchWood;
+import kz.nursultan.naturaltrees.mixin.FoliagePlacerTypeInvoker;
+import kz.nursultan.naturaltrees.mixin.TrunkPlacerTypeInvoker;
 import kz.nursultan.naturaltrees.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
 
 public class FabricPlatformHelper implements IPlatformHelper {
 
@@ -33,5 +46,26 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    @Override
+    public <R, T extends R> Supplier<T> register(Registry<R> registry, ResourceLocation id, Supplier<T> factory) {
+        final T value = Registry.register(registry, id, factory.get());
+        return () -> value;
+    }
+
+    @Override
+    public BranchBlock createBranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties) {
+        return new BranchBlock(wood, stripped, properties);
+    }
+
+    @Override
+    public <P extends TrunkPlacer> TrunkPlacerType<P> createTrunkPlacerType(MapCodec<P> codec) {
+        return TrunkPlacerTypeInvoker.naturaltrees$create(codec);
+    }
+
+    @Override
+    public <P extends FoliagePlacer> FoliagePlacerType<P> createFoliagePlacerType(MapCodec<P> codec) {
+        return FoliagePlacerTypeInvoker.naturaltrees$create(codec);
     }
 }

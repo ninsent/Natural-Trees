@@ -15,7 +15,41 @@
  */
 package kz.nursultan.naturaltrees.platform.services;
 
+import com.mojang.serialization.MapCodec;
+import java.util.function.Supplier;
+import kz.nursultan.naturaltrees.block.BranchBlock;
+import kz.nursultan.naturaltrees.block.BranchWood;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
+
 public interface IPlatformHelper {
+
+    /**
+     * Registers an object the loader's way: a {@code DeferredRegister} on NeoForge, {@code Registry.register}
+     * on Fabric. The factory runs once, when the loader is ready for it.
+     *
+     * @return a supplier of the registered object, valid once registration has happened
+     */
+    <R, T extends R> Supplier<T> register(Registry<R> registry, ResourceLocation id, Supplier<T> factory);
+
+    /**
+     * Creates a branch block. NeoForge returns a subclass that overrides the loader's extension methods for
+     * stripping and flammability; Fabric returns the common class and uses its registries (spec 6.4).
+     */
+    BranchBlock createBranchBlock(BranchWood wood, boolean stripped, BlockBehaviour.Properties properties);
+
+    /**
+     * Both placer type classes have a private constructor in vanilla (docs/assumptions.md). NeoForge makes
+     * them public; Fabric reaches them through invoker mixins (spec 8.1, 9.1).
+     */
+    <P extends TrunkPlacer> TrunkPlacerType<P> createTrunkPlacerType(MapCodec<P> codec);
+
+    <P extends FoliagePlacer> FoliagePlacerType<P> createFoliagePlacerType(MapCodec<P> codec);
 
     /**
      * Gets the name of the current platform

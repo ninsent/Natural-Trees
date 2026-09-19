@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "branches",
+  "key": { "#": { "item": "minecraft:cherry_log" } },
+  "pattern": [ "#", "#" ],
+  "result": { "count": 4, "id": "naturaltrees:cherry_branch" }
+}

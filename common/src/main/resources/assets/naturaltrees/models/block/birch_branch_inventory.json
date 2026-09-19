@@ -1,0 +1,7 @@
+{
+  "parent": "naturaltrees:block/branch_inventory",
+  "textures": {
+    "side": "minecraft:block/birch_log",
+    "end": "minecraft:block/birch_log_top"
+  }
+}

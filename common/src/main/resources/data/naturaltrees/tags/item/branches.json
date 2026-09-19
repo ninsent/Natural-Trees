@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "naturaltrees:oak_branch",
+    "naturaltrees:stripped_oak_branch",
+    "naturaltrees:spruce_branch",
+    "naturaltrees:stripped_spruce_branch",
+    "naturaltrees:birch_branch",
+    "naturaltrees:stripped_birch_branch",
+    "naturaltrees:jungle_branch",
+    "naturaltrees:stripped_jungle_branch",
+    "naturaltrees:acacia_branch",
+    "naturaltrees:stripped_acacia_branch",
+    "naturaltrees:dark_oak_branch",
+    "naturaltrees:stripped_dark_oak_branch",
+    "naturaltrees:mangrove_branch",
+    "naturaltrees:stripped_mangrove_branch",
+    "naturaltrees:cherry_branch",
+    "naturaltrees:stripped_cherry_branch"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "planks",
+  "ingredients": [ { "tag": "naturaltrees:spruce_branches" } ],
+  "result": { "count": 2, "id": "minecraft:spruce_planks" }
+}

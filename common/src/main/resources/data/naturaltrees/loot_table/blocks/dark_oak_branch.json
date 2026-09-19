@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [ { "condition": "minecraft:survives_explosion" } ],
+      "entries": [ { "type": "minecraft:item", "name": "naturaltrees:dark_oak_branch" } ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "naturaltrees:blocks/dark_oak_branch"
+}

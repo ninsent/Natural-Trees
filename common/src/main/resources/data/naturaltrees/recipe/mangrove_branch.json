@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "branches",
+  "key": { "#": { "item": "minecraft:mangrove_log" } },
+  "pattern": [ "#", "#" ],
+  "result": { "count": 4, "id": "naturaltrees:mangrove_branch" }
+}

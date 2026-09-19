@@ -15,13 +15,41 @@
  */
 package kz.nursultan.naturaltrees;
 
+import kz.nursultan.naturaltrees.block.BranchWood;
+import kz.nursultan.naturaltrees.command.NaturalTreesCommands;
+import kz.nursultan.naturaltrees.platform.NeoForgePlatformHelper;
+import kz.nursultan.naturaltrees.registry.ModBlocks;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 @Mod(Constants.MOD_ID)
 public class NaturalTrees {
 
-    public NaturalTrees(IEventBus eventBus) {
+    public NaturalTrees(IEventBus modBus) {
+        NeoForgePlatformHelper.setModBus(modBus);
         NaturalTreesCommon.init();
+        modBus.addListener(NaturalTrees::addToCreativeTabs);
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> NaturalTreesCommands.register(event.getDispatcher()));
+    }
+
+    private static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
+        final CreativeModeTab.TabVisibility everywhere = CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS;
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            for (BranchWood wood : BranchWood.values()) {
+                final ItemStack plain = new ItemStack(ModBlocks.branchItem(wood, false));
+                event.insertAfter(new ItemStack(wood.buildingTabAnchor()), plain, everywhere);
+                event.insertAfter(plain, new ItemStack(ModBlocks.branchItem(wood, true)), everywhere);
+            }
+        } else if (event.getTabKey() == CreativeModeTabs.NATURAL_BLOCKS) {
+            for (BranchWood wood : BranchWood.values()) {
+                event.insertAfter(new ItemStack(wood.naturalTabAnchor()), new ItemStack(ModBlocks.branchItem(wood, false)), everywhere);
+            }
+        }
     }
 }

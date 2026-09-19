@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "naturaltrees:oak_branch",
+    "naturaltrees:spruce_branch",
+    "naturaltrees:birch_branch",
+    "naturaltrees:jungle_branch",
+    "naturaltrees:acacia_branch",
+    "naturaltrees:dark_oak_branch",
+    "naturaltrees:mangrove_branch",
+    "naturaltrees:cherry_branch"
+  ]
+}

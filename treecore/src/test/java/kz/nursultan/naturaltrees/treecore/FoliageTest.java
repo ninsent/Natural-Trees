@@ -187,6 +187,43 @@ class FoliageTest {
     }
 
     @Test
+    void fallbackClusterIsFoliageAroundOneVoxel() {
+        TreeGenerator g = new TreeGenerator();
+        // A real tree first, so that the cluster has to cope with used buffers.
+        g.generate(TestSpecies.largeBuilder().build(), TestSpecies.largeFoliage(), 1, 20, PlacementLimits.NONE, ABOVE_GROUND, ABOVE_GROUND);
+        FoliageParams f = foliage(0.8, 4, 5, 40);
+        TreeResult r = g.generateCluster(f, 9, PlacementLimits.NONE, (x, y, z) -> y >= -1);
+        assertEquals(0, r.woodCount());
+        assertEquals(0, r.tipCount());
+        assertTrue(r.leafCount() > 10 && r.leafCount() <= 40, "leaves " + r.leafCount());
+        long hash = r.contentHash();
+        Set<Long> leaves = new HashSet<>();
+        for (int i = 0; i < r.leafCount(); i++) {
+            assertFalse(r.leafX(i) == 0 && r.leafY(i) == 0 && r.leafZ(i) == 0, "a leaf in the wood voxel");
+            assertTrue(r.leafY(i) >= -1, "a leaf where the world forbids it");
+            assertTrue(Math.abs(r.leafX(i)) <= 3 && Math.abs(r.leafZ(i)) <= 3, "inside radius_tip");
+            leaves.add(WoodTest.key(r.leafX(i), r.leafY(i), r.leafZ(i)));
+        }
+        // Every leaf connects to the voxel through leaves, within max_distance.
+        Set<Long> seen = new HashSet<>();
+        ArrayDeque<int[]> queue = new ArrayDeque<>();
+        queue.add(new int[] {0, 0, 0, 0});
+        while (!queue.isEmpty()) {
+            int[] v = queue.poll();
+            for (int[] face : FACES) {
+                long k = WoodTest.key(v[0] + face[0], v[1] + face[1], v[2] + face[2]);
+                if (leaves.contains(k) && seen.add(k)) {
+                    assertTrue(v[3] + 1 <= 5);
+                    queue.add(new int[] {v[0] + face[0], v[1] + face[1], v[2] + face[2], v[3] + 1});
+                }
+            }
+        }
+        assertEquals(leaves.size(), seen.size());
+        assertEquals(hash, new TreeGenerator().generateCluster(f, 9, PlacementLimits.NONE, (x, y, z) -> y >= -1).contentHash(),
+                "the same on a fresh generator");
+    }
+
+    @Test
     void noLeavesHangFromALimbThatWasNotPlaced() {
         // Everything above y = 5 is blocked: limbs are cut there, and no leaf may appear above the reach of what was placed.
         TreeGenerator g = new TreeGenerator();

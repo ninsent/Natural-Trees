@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "branches",
+  "key": { "#": { "item": "minecraft:dark_oak_log" } },
+  "pattern": [ "#", "#" ],
+  "result": { "count": 4, "id": "naturaltrees:dark_oak_branch" }
+}

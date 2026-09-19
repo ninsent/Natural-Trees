@@ -25,18 +25,29 @@ Last updated: 2026-09-19
 
 ## In progress
 
-- **Phase 0, T14 tuning.** Three rounds done by the agent (log in `phase-0-results.md`). Waiting for the human:
-  manual tests P0-2 (seed grids), P0-3 (the outsider check) and P0-4 (side view of the 28-tip species with the
-  load overlay). P0-1 passed (the human's screenshot, 2026-09-19). Viewer: `./gradlew :tools:viewer:run`.
-- **Phase 1 groundwork.** `docs/assumptions.md`: spec section 20 items 1–3 and 5–14 read in the 1.21.1
-  sources, all true (item 4 is due before Phase 2). `docs/plan-phase-1.md` is written and **waits for the
-  human's approval**. No Phase 1 code exists.
+- **Phase 1, T1–T9 done, uncommitted.** Block side (T1–T5): P1-1 to P1-4 passed in game (the human, 2026-09-19);
+  on their feedback a stub's cut end now shows the log's end grain (Q16). Placers (T6–T9): `ParamCodecs`
+  (ranges checked by `treecore`, so game and viewer agree), `WeberPennTrunkPlacer`, `SkeletonFoliagePlacer`,
+  `FoliageHandoff`, `TreeGenerators` (one generator per thread, chunk area from `WorldGenRegion.getCenter()`),
+  `ModPlacers`, Fabric invoker mixins, `/naturaltrees place` and `grid`, `TreeGenerator.generateCluster` for the
+  fallback of spec 9.1, and the test datapack `docs/test-datapacks/phase-1` (15 keys of spec 11.2).
+  Tests: `ParamCodecsTest` reads the viewer's species files through the game's codecs.
+  **First in-game result (the human's screenshot, 2026-09-19):** world generation with the test datapack grows
+  the mod's oaks and birches: log trunks, branch-block limbs, foliage on the limbs, nothing floating, no crown
+  cut in a straight line. The canopy is nearly closed because forests still use vanilla's tree count; spec 11.3
+  lowers it in Phase 2. **Still waiting for the human:** the far-chunk log search (P1-8), leaf persistence at
+  raised randomTickSpeed (P1-7), repeatability of `/naturaltrees place … 1` (P1-5), and their judgement of the look.
+- **Phase 0, T14 tuning.** Still waiting for the human: P0-2 (seed grids), P0-3 (the outsider check), P0-4.
+  With P1-5 the species can now be judged in the game itself, which is the better place.
 
 ## Blocked
 
 - Nothing.
 
 ## Notes for future sessions
+
+- TODO(naturaltrees): spec section 19 wants the stacked-logs recipe disabled when guita's Branches is installed.
+  Not done; it needs loader-specific recipe conditions and belongs with the compatibility work of Phase 4.
 
 - **Never commit.** The human makes every commit; suggest commit points with files and a message.
 - The human delegates spec-gap and small technical decisions: decide, record in `docs/questions.md`, continue.

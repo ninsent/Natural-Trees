@@ -1,0 +1,18 @@
+{
+  "block.naturaltrees.oak_branch": "Oak Branch",
+  "block.naturaltrees.stripped_oak_branch": "Stripped Oak Branch",
+  "block.naturaltrees.spruce_branch": "Spruce Branch",
+  "block.naturaltrees.stripped_spruce_branch": "Stripped Spruce Branch",
+  "block.naturaltrees.birch_branch": "Birch Branch",
+  "block.naturaltrees.stripped_birch_branch": "Stripped Birch Branch",
+  "block.naturaltrees.jungle_branch": "Jungle Branch",
+  "block.naturaltrees.stripped_jungle_branch": "Stripped Jungle Branch",
+  "block.naturaltrees.acacia_branch": "Acacia Branch",
+  "block.naturaltrees.stripped_acacia_branch": "Stripped Acacia Branch",
+  "block.naturaltrees.dark_oak_branch": "Dark Oak Branch",
+  "block.naturaltrees.stripped_dark_oak_branch": "Stripped Dark Oak Branch",
+  "block.naturaltrees.mangrove_branch": "Mangrove Branch",
+  "block.naturaltrees.stripped_mangrove_branch": "Stripped Mangrove Branch",
+  "block.naturaltrees.cherry_branch": "Cherry Branch",
+  "block.naturaltrees.stripped_cherry_branch": "Stripped Cherry Branch"
+}
