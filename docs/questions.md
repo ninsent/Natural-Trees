@@ -168,3 +168,30 @@ seed draws one and prints it, so any tree can be placed again.
   files, output checked in, with a test that each file equals vanilla's except for the two placer objects.
   `azalea_tree` uses oak logs but is not in spec 11.2 or the Phase 3 list, so it stays vanilla.
 
+### Q22–Q24 — gaps found while planning Phase 3
+
+*Decisions (delegated, 2026-09-19), details in `plan-phase-3.md`:*
+
+- **Q22, `trunk_vine` on trees with hundreds of wood voxels.** Vanilla's decorator visits every position in the log
+  list, which now includes every branch block (`assumptions.md`, P3-4). First version: vanilla's decorators
+  unchanged, as spec section 10 says, and the human judges the amount in game. If it is too much, the jungle species
+  files drop `trunk_vine` and keep `leave_vine`, as a recorded and tested difference from vanilla's file. No code
+  filters the log list.
+- **Q23, the mixed placed features left at vanilla's count in Phase 2 (Q19).** Retuned in Phase 3 by the same rule,
+  together with the new ones; those already at 0–1 trees per chunk stay vanilla's. `bamboo_vegetation` and
+  `dark_forest_vegetation` also place bamboo and huge mushrooms, so their counts are judged in game before they stay.
+- **Q24, `jungle_bush` and `azalea_tree`.** Not in the spec; they stay vanilla.
+
+### Q25 — A sleeve thinner than one block can produce no leaves at all (spec 7.6, 9.2)
+
+*Found while drafting the conifers (2026-09-19).* The ranges of 9.2 allow `radius_tip` 0.5 and `flatten` 0.3. An
+ellipsoid whose vertical radius is under half a block, shifted by `lift`, can sit between two block layers and
+contain no block centre; a horizontal radius under 1.0 reaches no neighbouring block either. A spruce drafted with
+`flatten` 0.45, `radius_tip` 0.8 and `lift` 0.5 had a bare top, and one tree in a thousand came out as a pole with
+26 leaves.
+*Decision (delegated):* the generator stays as the spec writes it: every ellipsoid is evaluated analytically from its
+own radius, and nothing is rounded up behind the author's back. The remedy is data and is now tested: keep
+`radius × flatten` at about 0.6 or more and radii at 1.0 or more where leaves are wanted. `ViewerTest` fails any
+shipped species in which even one tree of 1,000 has 30 leaves or fewer. **Proposed spec change:** a sentence in 9.2
+saying so, since a datapack author will meet it.
+

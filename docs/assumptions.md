@@ -72,3 +72,33 @@ Consequences for Phase 2:
   `trees_badlands`. The mixed ones (`dark_forest_vegetation`, `trees_water`, the windswept, savanna and jungle
   ones, `bamboo_vegetation`) also place species that stay vanilla until Phase 3; lowering their count now would
   thin those too.
+
+## Phase 3: facts read before planning (2026-09-19)
+
+Not items of spec section 20; they are what the remaining woods newly rely on. Read in the same sources.
+
+| # | Fact | Verdict | Read in |
+|---|---|---|---|
+| P3-1 | A tree from 2×2 saplings is placed with its origin at the **north-west** sapling, the four saplings having been cleared, so the origin column plus +x, +z and +x+z is exactly the sapling square. | **True.** `placeMega` loops the offsets, and calls `configuredfeature.place(level, generator, random, pos.offset(i, 0, j))` for the square whose corner is `(i, j)`. Matches spec 7.4 and assumption 13. | `TreeGrower` (lines 136–150) |
+| P3-2 | The mangrove root placer hands the trunk placer a raised origin, and the trunk placer needs to know nothing about roots. | **True.** `RootPlacer.getTrunkOrigin` returns `pos.above(trunk_offset_y)`; `TreeFeature.doPlace` places the roots from `pos` to that origin and then calls `placeTrunk` with it. Roots are in their own position set, excluded from distance baking (assumption 2). | `RootPlacer.getTrunkOrigin`; `TreeFeature.doPlace` |
+| P3-3 | `cocoa` with branches in the log list. | **Fine.** It takes logs at most 2 above the lowest log, which are trunk logs, and hangs cocoa beside them where there is air. Cocoa survives on `#minecraft:jungle_logs`, which a jungle branch carries. | `CocoaDecorator.place`; `CocoaBlock.canSurvive` |
+| P3-4 | `trunk_vine` with branches in the log list. | **Works, but look at it.** It visits **every** position in the log list and, on each of four sides that is air, places a vine with chance 2/3. A vanilla jungle tree has about 10 logs; one of ours has 50 to 400 wood voxels, so every limb and twig would be hung with vines. Nothing fails; whether it looks right is for the human (plan decision Q22). | `TrunkVineDecorator.place` |
+| P3-5 | `leave_vine` and `attached_to_leaves` (mangrove propagules). | **Fine.** Both read only the leaf list. More leaves means more vines and propagules in proportion. | `LeaveVineDecorator`, `AttachedToLeavesDecorator` |
+| P3-6 | `alter_ground` (podzol under mega spruce and pine). | **Fine.** It circles the logs at the lowest Y of the log list, which is the trunk base. A limb that droops below the base on a slope would move the circles there; rare, harmless. | `AlterGroundDecorator.place` |
+
+Remaining vanilla tree features, all `two_layers` size except dark oak (`three_layers`):
+
+| Key | Vanilla height | Vanilla placers | Decorators, roots |
+|---|---|---|---|
+| `spruce` | 5+2+1 | straight, spruce foliage | |
+| `pine` | 6+4+0 | straight, pine foliage | |
+| `mega_spruce`, `mega_pine` | 13+2+14 | giant (2×2), mega pine foliage | `alter_ground` |
+| `acacia` | 5+2+2 | forking, acacia foliage | |
+| `cherry`, `cherry_bees_005` | 7+1+0 | cherry, cherry foliage | beehive on the second |
+| `jungle_tree`, `jungle_tree_no_vine` | 4+8+0 | straight, blob | `cocoa`, `trunk_vine`, `leave_vine` on the first |
+| `mega_jungle_tree` | 10+2+19 | mega jungle (2×2), jungle foliage | `trunk_vine`, `leave_vine` |
+| `swamp_oak` | 5+3+0 | straight, blob | `leave_vine` |
+| `mangrove`, `tall_mangrove` | 2+1+4, 4+1+9 | upwards branching, random spread | `leave_vine`, `attached_to_leaves`, beehive; **mangrove root placer** |
+| `dark_oak` | 6+2+1 | dark oak (2×2), dark oak foliage | |
+| not in the spec's list | `jungle_bush` (one log and a bush), `azalea_tree` | | they stay vanilla |
+

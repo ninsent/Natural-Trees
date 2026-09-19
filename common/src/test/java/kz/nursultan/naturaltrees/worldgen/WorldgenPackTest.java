@@ -62,6 +62,7 @@ class WorldgenPackTest {
         }
     }
 
+    /** The species file behind a vanilla key: the families of spec 11.2 and the Phase 3 woods. */
     private static String speciesOf(String key) {
         if (key.startsWith("super_birch")) {
             return "tall_birch";
@@ -69,13 +70,25 @@ class WorldgenPackTest {
         if (key.startsWith("fancy_oak")) {
             return "fancy_oak";
         }
-        return key.startsWith("birch") ? "birch" : "oak";
+        if (key.startsWith("birch")) {
+            return "birch";
+        }
+        if (key.startsWith("oak")) {
+            return "oak";
+        }
+        if (key.startsWith("cherry")) {
+            return "cherry";
+        }
+        if (key.startsWith("jungle_tree")) {
+            return "jungle";
+        }
+        return key.equals("mega_jungle_tree") ? "mega_jungle" : key;
     }
 
     @Test
     void configuredFeaturesAreVanillaExceptTheTwoPlacers() throws IOException {
         List<Path> files = files("configured_feature");
-        assertEquals(15, files.size(), "the 15 keys of spec 11.2");
+        assertEquals(29, files.size(), "the 15 keys of spec 11.2 and the 14 of Phase 3");
         try (ZipFile jar = vanilla()) {
             for (Path file : files) {
                 String key = file.getFileName().toString().replace(".json", "");
@@ -99,7 +112,7 @@ class WorldgenPackTest {
     @Test
     void placedFeaturesAreVanillaExceptTheCount() throws IOException {
         List<Path> files = files("placed_feature");
-        assertEquals(5, files.size());
+        assertEquals(18, files.size());
         try (ZipFile jar = vanilla()) {
             for (Path file : files) {
                 String key = file.getFileName().toString().replace(".json", "");
@@ -115,14 +128,20 @@ class WorldgenPackTest {
                     if (!"minecraft:count".equals(mine.get("type").getAsString())) {
                         continue;
                     }
-                    JsonArray a = mine.getAsJsonObject("count").getAsJsonArray("distribution");
-                    JsonArray b = vanillas.getAsJsonObject("count").getAsJsonArray("distribution");
-                    for (int k = 0; k < a.size(); k++) {
-                        int mineData = a.get(k).getAsJsonObject().get("data").getAsInt();
-                        int vanillaData = b.get(k).getAsJsonObject().get("data").getAsInt();
-                        assertTrue(mineData >= 1 && mineData < vanillaData, key + ": fewer trees than vanilla, never none");
-                        assertEquals(b.get(k).getAsJsonObject().get("weight"), a.get(k).getAsJsonObject().get("weight"), key);
+                    if (mine.get("count").isJsonPrimitive()) {
+                        int mineCount = mine.get("count").getAsInt();
+                        assertTrue(mineCount >= 1 && mineCount < vanillas.get("count").getAsInt(), key + ": fewer trees than vanilla, never none");
                         fewer = true;
+                    } else {
+                        JsonArray a = mine.getAsJsonObject("count").getAsJsonArray("distribution");
+                        JsonArray b = vanillas.getAsJsonObject("count").getAsJsonArray("distribution");
+                        for (int k = 0; k < a.size(); k++) {
+                            int mineData = a.get(k).getAsJsonObject().get("data").getAsInt();
+                            int vanillaData = b.get(k).getAsJsonObject().get("data").getAsInt();
+                            assertTrue(mineData >= 1 && mineData < vanillaData, key + ": fewer trees than vanilla, never none");
+                            assertEquals(b.get(k).getAsJsonObject().get("weight"), a.get(k).getAsJsonObject().get("weight"), key);
+                            fewer = true;
+                        }
                     }
                     mine.add("count", vanillas.get("count"));
                 }

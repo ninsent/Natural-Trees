@@ -1,0 +1,83 @@
+{
+  "trunk_placer": {
+    "type": "naturaltrees:weber_penn",
+    "base_height": 8,
+    "height_rand_a": 5,
+    "height_rand_b": 0,
+    "branch_provider": {
+      "type": "minecraft:simple_state_provider",
+      "state": {
+        "Name": "naturaltrees:mangrove_branch"
+      }
+    },
+    "shape": "hemispherical",
+    "base_size": 0.3,
+    "attraction_up": -0.5,
+    "twig_radius": 0.25,
+    "pipe_exponent": 2.0,
+    "trunk_width_min": 1,
+    "trunk_width_max": 1,
+    "trunk_leader": false,
+    "max_radius": 8,
+    "foliage_margin": 4,
+    "max_tips": 14,
+    "trunk": {
+      "curve": 15,
+      "curve_back": 0,
+      "curve_v": 30,
+      "curve_res": 3,
+      "base_splits": 1,
+      "seg_splits": 0.0,
+      "split_angle": 0,
+      "split_angle_v": 0
+    },
+    "levels": [
+      {
+        "branches": 5,
+        "length": 0.8,
+        "length_v": 0.1,
+        "down_angle": 50,
+        "down_angle_v": 10,
+        "rotate": 140,
+        "rotate_v": 30,
+        "curve": 55,
+        "curve_back": 0,
+        "curve_v": 30,
+        "curve_res": 3,
+        "seg_splits": 0.2,
+        "split_angle": 35,
+        "split_angle_v": 10
+      },
+      {
+        "branches": 3,
+        "length": 0.5,
+        "length_v": 0.1,
+        "down_angle": 50,
+        "down_angle_v": 10,
+        "rotate": 140,
+        "rotate_v": 30,
+        "curve": 25,
+        "curve_back": 0,
+        "curve_v": 25,
+        "curve_res": 2,
+        "seg_splits": 0.0,
+        "split_angle": 0,
+        "split_angle_v": 0
+      }
+    ]
+  },
+  "foliage_placer": {
+    "type": "naturaltrees:skeleton",
+    "foliage_start": 0.4,
+    "trunk_foliage": 0.2,
+    "radius_base": 1.3,
+    "radius_tip": 2.3,
+    "radius_v": 0.2,
+    "flatten": 0.6,
+    "lift": 0.1,
+    "density": 0.8,
+    "smother": 4,
+    "max_distance": 5,
+    "max_leaves": 600
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "trunk_placer": {
+    "type": "naturaltrees:weber_penn",
+    "base_height": 20,
+    "height_rand_a": 8,
+    "height_rand_b": 0,
+    "branch_provider": {
+      "type": "minecraft:simple_state_provider",
+      "state": {
+        "Name": "naturaltrees:jungle_branch"
+      }
+    },
+    "shape": "spherical",
+    "base_size": 0.6,
+    "attraction_up": 0.4,
+    "twig_radius": 0.25,
+    "pipe_exponent": 2.0,
+    "trunk_width_min": 2,
+    "trunk_width_max": 2,
+    "trunk_leader": false,
+    "max_radius": 12,
+    "foliage_margin": 4,
+    "max_tips": 28,
+    "trunk": {
+      "curve": 0,
+      "curve_back": 0,
+      "curve_v": 8,
+      "curve_res": 5,
+      "base_splits": 0,
+      "seg_splits": 0.0,
+      "split_angle": 0,
+      "split_angle_v": 0
+    },
+    "levels": [
+      {
+        "branches": 14,
+        "length": 0.38,
+        "length_v": 0.08,
+        "down_angle": 70,
+        "down_angle_v": -25,
+        "rotate": 140,
+        "rotate_v": 25,
+        "curve": -20,
+        "curve_back": 0,
+        "curve_v": 35,
+        "curve_res": 4,
+        "seg_splits": 0.2,
+        "split_angle": 35,
+        "split_angle_v": 10
+      },
+      {
+        "branches": 4,
+        "length": 0.45,
+        "length_v": 0.1,
+        "down_angle": 45,
+        "down_angle_v": 10,
+        "rotate": 140,
+        "rotate_v": 30,
+        "curve": 0,
+        "curve_back": 0,
+        "curve_v": 30,
+        "curve_res": 2,
+        "seg_splits": 0.0,
+        "split_angle": 0,
+        "split_angle_v": 0
+      }
+    ]
+  },
+  "foliage_placer": {
+    "type": "naturaltrees:skeleton",
+    "foliage_start": 0.45,
+    "trunk_foliage": 0.12,
+    "radius_base": 1.4,
+    "radius_tip": 2.6,
+    "radius_v": 0.2,
+    "flatten": 0.6,
+    "lift": 0.3,
+    "density": 0.8,
+    "smother": 4,
+    "max_distance": 5,
+    "max_leaves": 1200
+  }
+}

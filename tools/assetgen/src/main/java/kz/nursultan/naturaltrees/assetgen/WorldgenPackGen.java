@@ -51,7 +51,12 @@ final class WorldgenPackGen {
      * {@code trees_plains} and {@code trees_meadow} are as sparse as they should be and are left to vanilla.
      */
     static final List<String> PLACED = List.of("trees_birch_and_oak", "trees_birch", "birch_tall",
-            "trees_flower_forest", "trees_badlands");
+            "trees_flower_forest", "trees_badlands",
+            // Phase 3 (questions.md Q23). Left to vanilla because a third of their count is no fewer trees:
+            // trees_savanna (1-2), trees_snowy, trees_windswept_hills, trees_water, trees_plains (0-1), trees_meadow.
+            "trees_taiga", "trees_grove", "trees_old_growth_pine_taiga", "trees_old_growth_spruce_taiga",
+            "trees_jungle", "trees_sparse_jungle", "bamboo_vegetation", "trees_windswept_savanna",
+            "trees_windswept_forest", "trees_swamp", "trees_mangrove", "trees_cherry", "dark_forest_vegetation");
 
     /** Trees per chunk as a fraction of vanilla's: about 3 to 4 where vanilla places about 10 (spec 11.3). */
     static final double DENSITY = 1.0 / 3.0;
@@ -67,6 +72,19 @@ final class WorldgenPackGen {
         map.put("fancy_oak", List.of("fancy_oak", "fancy_oak_bees", "fancy_oak_bees_0002", "fancy_oak_bees_002", "fancy_oak_bees_005"));
         map.put("birch", List.of("birch", "birch_bees_0002", "birch_bees_002", "birch_bees_005"));
         map.put("tall_birch", List.of("super_birch_bees", "super_birch_bees_0002"));
+        // Phase 3. jungle_bush and azalea_tree are not in the spec's list and stay vanilla (questions.md Q24).
+        map.put("spruce", List.of("spruce"));
+        map.put("pine", List.of("pine"));
+        map.put("mega_spruce", List.of("mega_spruce"));
+        map.put("mega_pine", List.of("mega_pine"));
+        map.put("acacia", List.of("acacia"));
+        map.put("cherry", List.of("cherry", "cherry_bees_005"));
+        map.put("jungle", List.of("jungle_tree", "jungle_tree_no_vine"));
+        map.put("mega_jungle", List.of("mega_jungle_tree"));
+        map.put("swamp_oak", List.of("swamp_oak"));
+        map.put("mangrove", List.of("mangrove"));
+        map.put("tall_mangrove", List.of("tall_mangrove"));
+        map.put("dark_oak", List.of("dark_oak"));
         return map;
     }
 
@@ -130,7 +148,12 @@ final class WorldgenPackGen {
         boolean changed = false;
         for (JsonElement element : placed.getAsJsonArray("placement")) {
             JsonObject modifier = element.getAsJsonObject();
-            if (!"minecraft:count".equals(modifier.get("type").getAsString()) || !modifier.get("count").isJsonObject()) {
+            if (!"minecraft:count".equals(modifier.get("type").getAsString())) {
+                continue;
+            }
+            if (modifier.get("count").isJsonPrimitive()) {
+                modifier.addProperty("count", scaled(modifier.get("count").getAsInt(), density));
+                changed = true;
                 continue;
             }
             JsonArray distribution = modifier.getAsJsonObject("count").getAsJsonArray("distribution");
@@ -138,14 +161,19 @@ final class WorldgenPackGen {
             for (JsonElement entry : distribution) {
                 base = Math.min(base, entry.getAsJsonObject().get("data").getAsInt());
             }
-            int scaled = (int) Math.round(base * density);
+            int scaledBase = scaled(base, density);
             for (JsonElement entry : distribution) {
                 JsonObject o = entry.getAsJsonObject();
-                o.addProperty("data", scaled + o.get("data").getAsInt() - base);
+                o.addProperty("data", scaledBase + o.get("data").getAsInt() - base);
             }
             changed = true;
         }
         return changed;
+    }
+
+    /** A count scaled by the density: never below one tree where vanilla places any, and never more than vanilla. */
+    private static int scaled(int count, double density) {
+        return count == 0 ? 0 : Math.min(count, Math.max(1, (int) Math.round(count * density)));
     }
 
     private static JsonObject read(ZipFile jar, String name) throws IOException {

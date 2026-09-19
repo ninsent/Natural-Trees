@@ -159,10 +159,21 @@ class ViewerTest {
     /** Spec section 15: block counts of every shipped species stay inside the budget of its size class. */
     @Test
     void speciesStayInsideTheirSizeClassBudgets() throws Exception {
-        // name, wood voxels, tips, leaves, max_radius
-        Object[][] budgets = {{"oak", 50, 8, 250, 5}, {"birch", 50, 8, 250, 5}, {"fancy_oak", 140, 14, 600, 8},
-            {"tall_birch", 140, 14, 600, 8}, {"test_28_tips", 400, 28, 1200, 12}};
+        // name, wood voxels, tips, leaves, max_radius (the size classes of spec 15); then whether the base must be
+        // 2×2 in every seed, and whether the trunk may still be 2×2 at its top (no trunk_leader, trunk_width_min 2).
+        Object[][] budgets = {
+            {"oak", 50, 8, 250, 5, false, false}, {"birch", 50, 8, 250, 5, false, false},
+            {"spruce", 50, 8, 250, 5, false, false}, {"jungle", 50, 8, 250, 5, false, false},
+            {"swamp_oak", 50, 8, 250, 5, false, false}, {"mangrove", 50, 8, 250, 6, false, false},
+            {"fancy_oak", 140, 14, 600, 8, false, false}, {"tall_birch", 140, 14, 600, 8, false, false},
+            {"pine", 140, 14, 600, 8, false, false}, {"acacia", 140, 14, 600, 8, false, false},
+            {"cherry", 140, 14, 600, 8, false, false}, {"tall_mangrove", 140, 14, 600, 8, false, false},
+            {"dark_oak", 140, 14, 600, 8, true, true},
+            {"mega_spruce", 400, 28, 1200, 12, true, false}, {"mega_pine", 400, 28, 1200, 12, true, false},
+            {"mega_jungle", 400, 28, 1200, 12, true, true}, {"test_28_tips", 400, 28, 1200, 12, true, false}};
+        assertEquals(ViewerServer.SPECIES.length, budgets.length, "every shipped species has a budget");
         TreeGenerator g = new TreeGenerator();
+        List<String> problems = new java.util.ArrayList<>();
         for (Object[] budget : budgets) {
             String name = (String) budget[0];
             Map<String, Object> file = species(name);
@@ -176,25 +187,40 @@ class ViewerTest {
             assertTrue(foliage.maxLeaves() <= (int) budget[3], name + " max_leaves");
             assertTrue(trunk.foliageMargin() >= foliage.requiredMargin(), name + " foliage_margin is lower than its foliage needs");
             int wide = 0;
+            int minLeaves = Integer.MAX_VALUE, maxWood = 0, sparse = 0, heavy = 0, narrowBase = 0;
             for (long seed = 0; seed < 1000; seed++) {
                 int height = base + (int) (seed % (range + 1));
                 TreeResult r = g.generate(trunk, foliage, seed, height, PlacementLimits.NONE, (x, y, z) -> y >= 0, (x, y, z) -> y >= 0);
-                assertTrue(r.woodCount() <= (int) budget[1], name + " seed " + seed + ": " + r.woodCount() + " wood voxels");
                 assertTrue(r.tipCount() <= (int) budget[2], name + " tips");
                 assertTrue(r.leafCount() <= (int) budget[3], name + " leaves");
-                assertTrue(r.leafCount() > 30, name + " seed " + seed + ": a tree with " + r.leafCount() + " leaves");
+                minLeaves = Math.min(minLeaves, r.leafCount());
+                maxWood = Math.max(maxWood, r.woodCount());
+                sparse += r.leafCount() <= 30 ? 1 : 0;
+                heavy += r.woodCount() > (int) budget[1] ? 1 : 0;
                 for (int i = 0; i < r.tipCount(); i++) {
                     wide += r.tipOnWideTrunk(i) ? 1 : 0;
                 }
-                if (name.equals("test_28_tips")) {
+                if ((boolean) budget[5]) {
                     boolean baseWide = false;
                     for (int i = 0; i < r.woodCount(); i++) {
                         baseWide |= r.woodX(i) == 1 && r.woodY(i) == 0 && r.woodZ(i) == 1;
                     }
-                    assertTrue(baseWide, "seed " + seed + ": the 28-tip species has a 2×2 lower trunk");
+                    narrowBase += baseWide ? 0 : 1;
                 }
             }
-            assertEquals(0, wide, name + ": the trunk narrows to 1×1 before its top");
+            if (sparse > 0) {
+                problems.add(name + ": " + sparse + " of 1000 trees have 30 leaves or fewer (fewest " + minLeaves + ")");
+            }
+            if (heavy > 0) {
+                problems.add(name + ": " + heavy + " of 1000 trees exceed " + budget[1] + " wood voxels (most " + maxWood + ")");
+            }
+            if (narrowBase > 0) {
+                problems.add(name + ": " + narrowBase + " of 1000 trees lack the 2×2 base");
+            }
+            if (!(boolean) budget[6] && wide > 0) {
+                problems.add(name + ": the trunk is still 2×2 at its top in " + wide + " trees");
+            }
         }
+        assertTrue(problems.isEmpty(), String.join("; ", problems));
     }
 }
