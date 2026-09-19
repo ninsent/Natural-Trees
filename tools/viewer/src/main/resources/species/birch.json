@@ -11,7 +11,7 @@
       }
     },
     "shape": "tend_flame",
-    "base_size": 0.35,
+    "base_size": 0.3,
     "attraction_up": 0.5,
     "twig_radius": 0.25,
     "pipe_exponent": 2.0,
@@ -34,9 +34,9 @@
     "levels": [
       {
         "branches": 8,
-        "length": 0.4,
+        "length": 0.45,
         "length_v": 0.05,
-        "down_angle": 45,
+        "down_angle": 40,
         "down_angle_v": 10,
         "rotate": 140,
         "rotate_v": 20,
@@ -50,7 +50,7 @@
       },
       {
         "branches": 2,
-        "length": 0.4,
+        "length": 0.35,
         "length_v": 0.1,
         "down_angle": 35,
         "down_angle_v": 10,
@@ -69,12 +69,12 @@
   "foliage_placer": {
     "type": "naturaltrees:skeleton",
     "foliage_start": 0.3,
-    "trunk_foliage": 0.35,
-    "radius_base": 1.0,
-    "radius_tip": 1.8,
+    "trunk_foliage": 0.4,
+    "radius_base": 0.9,
+    "radius_tip": 1.6,
     "radius_v": 0.15,
-    "flatten": 0.9,
-    "lift": 0.2,
+    "flatten": 1.2,
+    "lift": 0.1,
     "density": 0.85,
     "smother": 4,
     "max_distance": 5,

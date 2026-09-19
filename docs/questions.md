@@ -56,7 +56,10 @@ can see them.
 With `trunk_leader` the pipe model governs the trunk, and `trunk_width_min` holds only on the bare part of
 the trunk, from the base up to the first stem attached to it. The purpose of a minimum of 2 is the 2×2
 sapling footprint, which this keeps, and the trunk then narrows 2×2 → 1×1 → branch leader in order instead
-of jumping from 2×2 to branch blocks. `trunk_width_max` always applies. To be looked at again when the
+of jumping from 2×2 to branch blocks. The same holds for a minimum of 1: with `trunk_leader` the bare part of the
+trunk is never thinner than a 1×1 log, so the leader begins at the first limb or above. Without this a tree that
+ends up with three tips or fewer (a small birch that lost limbs to the 2-block rule or to an obstacle) would be a
+stick of branch blocks from the ground up, which tuning showed on 2 of 6 seeds. `trunk_width_max` always applies. To be looked at again when the
 mega spruce is tuned in Phase 3. **Proposed spec change:** add this sentence to the `trunk_leader` rule of 7.2.
 
 ### Q7 — Tip budget and split clones (spec 7.3)

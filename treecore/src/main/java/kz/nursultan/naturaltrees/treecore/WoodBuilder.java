@@ -203,6 +203,10 @@ final class WoodBuilder {
             } else {
                 if (!params.trunkLeader()) {
                     logEnd = s.endOffset();
+                } else if (i == 0) {
+                    // questions.md Q6: the bare part of the trunk is never thinner than a log, so a tree with
+                    // few tips is not a stick of branch blocks. The leader begins at the first limb or above.
+                    logEnd = StrictMath.max(logEnd, firstAttachment);
                 }
                 if (params.trunkWidthMax() < 2) {
                     wideEnd = s.startOffset;

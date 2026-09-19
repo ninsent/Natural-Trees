@@ -190,6 +190,13 @@ class WoodTest {
             Stem trunk = g.skeleton.stems[0];
             assertTrue(trunk.logEnd < trunk.endOffset(), "the leader is branch blocks where the load is below 4");
             assertTrue(g.wood.loadAt(trunk, trunk.logEnd + 1e-6) < 4);
+            assertTrue(trunk.logEnd >= g.skeleton.stems[trunk.firstAttached].parentOffset, "the bare trunk is logs");
+
+            // With few tips the load is below 4 everywhere; the trunk is still logs up to its first limb.
+            grow(g, TestSpecies.oakBuilder().trunkLeader(true).maxTips(3).build(), seed, 9);
+            Stem sparse = g.skeleton.stems[0];
+            assertTrue(sparse.baseLoad <= 3);
+            assertTrue(sparse.logEnd > 0 && sparse.logEnd < sparse.endOffset(), "logs below the first limb, leader above");
             // The trunk is emitted first, so the first tip is the trunk's.
             assertTrue(isBranchAt(r, r.tipX(0), r.tipY(0), r.tipZ(0)));
 
