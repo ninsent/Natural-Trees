@@ -19,12 +19,18 @@ import kz.nursultan.naturaltrees.block.BranchWood;
 import kz.nursultan.naturaltrees.command.NaturalTreesCommands;
 import kz.nursultan.naturaltrees.platform.NeoForgePlatformHelper;
 import kz.nursultan.naturaltrees.registry.ModBlocks;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
@@ -35,6 +41,12 @@ public class NaturalTrees {
         NeoForgePlatformHelper.setModBus(modBus);
         NaturalTreesCommon.init();
         modBus.addListener(NaturalTrees::addToCreativeTabs);
+        // Spec 11.1: the world generation pack is optional and enabled by default. PackSource.BUILT_IN adds it
+        // to new worlds automatically; alwaysActive false leaves the player free to disable it.
+        modBus.addListener((AddPackFindersEvent event) -> event.addPackFinders(
+                ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "resourcepacks/" + Constants.WORLDGEN_PACK),
+                PackType.SERVER_DATA, Component.translatable("pack.naturaltrees.worldgen"), PackSource.BUILT_IN,
+                false, Pack.Position.TOP));
         NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> NaturalTreesCommands.register(event.getDispatcher()));
     }
 

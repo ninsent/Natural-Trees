@@ -11,7 +11,7 @@ manual tests.
 | 1 | `TrunkPlacer.placeTrunk` receives a level reader, a block setter, a `RandomSource`, the free height, the origin and the `TreeConfiguration`, and returns a list of `FoliageAttachment`. Any block state may be placed through the setter. | **True.** `placeTrunk(LevelSimulatedReader, BiConsumer<BlockPos, BlockState>, RandomSource, int freeTreeHeight, BlockPos, TreeConfiguration)`. The setter only records the position and calls `level.setBlock(pos, state, 19)`; it does not look at the state. | `TrunkPlacer.placeTrunk`; `TreeFeature.place` (the `biconsumer1` lambda) |
 | 2 | Positions placed through the trunk setter seed `updateLeaves` as distance-0 sources regardless of tag, and positions placed through the foliage setter receive baked distances. | **True, with a nuance.** `place` calls `updateLeaves(level, box, set1, set3, set)` where `set1` is the trunk setter's set; its positions are put in the distance-0 list with no tag test. The search then walks face neighbours and takes any block for which `LeavesBlock.getOptionalDistanceAt` answers: a block in `#minecraft:logs` counts as 0, a block with a `distance` property gets `min(own, k + 1)` written. Leaves are found by that property, **not** by membership of the foliage set, so every leaf reachable through leaves is baked. Positions of decorators and roots are excluded. | `TreeFeature.place`, `TreeFeature.updateLeaves`; `LeavesBlock.getOptionalDistanceAt` |
 | 3 | `LeavesBlock` reads the `#minecraft:logs` **block** tag at runtime, so a leaf next to a branch resolves to `distance = 1`. | **True.** `getOptionalDistanceAt`: `state.is(BlockTags.LOGS)` gives 0; `updateDistance` takes the minimum over the six neighbours plus 1. | `LeavesBlock.getOptionalDistanceAt`, `LeavesBlock.updateDistance` |
-| 4 | The exact configured-feature keys referenced by every `TreeGrower`, by structures and by every biome selector. | **Open; due before Phase 2** (spec 11.2). Read so far, `TreeGrower`: `OAK`, `OAK_BEES_005`, `FANCY_OAK`, `FANCY_OAK_BEES_005`, `BIRCH`, `BIRCH_BEES_005`, `SPRUCE`, `MEGA_SPRUCE`, `MEGA_PINE`, `JUNGLE_TREE_NO_VINE`, `MEGA_JUNGLE_TREE`, `ACACIA`, `DARK_OAK`, `CHERRY`, `CHERRY_BEES_005`, `MANGROVE`, `TALL_MANGROVE`, `AZALEA_TREE`. | `TreeGrower` (static fields) |
+| 4 | The exact configured-feature keys referenced by every `TreeGrower`, by structures and by every biome selector. | **Confirmed for the oak and birch families (2026-09-19); see "Item 4 in full" below.** The 15 keys of spec 11.2 are exactly vanilla's oak, fancy oak, birch and tall birch `minecraft:tree` features, and every one of them is reachable. | vanilla data: `worldgen/configured_feature`, `placed_feature`, `biome`, `template_pool`; `TreeGrower` |
 | 5 | Vanilla plank recipes read per-wood **item** tags, so a branch outside them has exactly one plank recipe. | **True.** `data/minecraft/recipe/oak_planks.json`: shapeless, ingredient `{"tag": "minecraft:oak_logs"}`, result 4 planks. | vanilla data |
 | 6 | The full set of block tags that vanilla logs carry. | **Found.** Directly: `minecraft:<wood>_logs`, `minecraft:overworld_natural_logs` (the un-stripped log only). Through `<wood>_logs`: `logs_that_burn`, then `logs`. Through `logs`: `mineable/axe`, `completes_find_tree_tutorial`, `lava_pool_stone_cannot_replace`, `parrots_spawnable_on`. Through `overworld_natural_logs`: `snaps_goat_horn`. | vanilla data, `data/minecraft/tags/block/` |
 | 7 | Fabric's strippable-block registry requires an `axis` property, so the branch needs its own hook. | **True.** `StrippableBlockRegistry.register` calls `requireNonNullAndAxisProperty` on both blocks and throws `IllegalArgumentException("… must have the 'axis' property")`. | Fabric API `fabric-content-registries-v0` 8.0.11, `StrippableBlockRegistry` |
@@ -32,3 +32,43 @@ manual tests.
   log, which is the convention spec 8.1 step 8 names.
 - `TreeFeature.doPlace` passes the **free** height, which is lower than the drawn height when `minimum_size`
   allows clipping; the generator takes whatever it is given.
+
+## Item 4 in full
+
+1.21.1 has 31 `minecraft:tree` configured features. Those on oak or birch logs:
+
+| Family (spec 11.2) | Keys | Vanilla placers |
+|---|---|---|
+| Oak | `oak`, `oak_bees_0002`, `oak_bees_002`, `oak_bees_005` | straight trunk, blob foliage |
+| Fancy oak | `fancy_oak`, `fancy_oak_bees`, `fancy_oak_bees_0002`, `fancy_oak_bees_002`, `fancy_oak_bees_005` | fancy trunk, fancy foliage |
+| Birch | `birch`, `birch_bees_0002`, `birch_bees_002`, `birch_bees_005` | straight trunk, blob foliage |
+| Tall birch | `super_birch_bees`, `super_birch_bees_0002` | straight trunk, blob foliage |
+| Not in 11.2 | `swamp_oak` (Phase 3), `azalea_tree` (oak logs, azalea leaves; the spec does not mention it, so it stays vanilla) | |
+
+Who reaches the 15 keys:
+
+- **Saplings** (`TreeGrower`): `oak`, `oak_bees_005`, `fancy_oak`, `fancy_oak_bees_005`, `birch`, `birch_bees_005`.
+- **Structures**: the placed feature `minecraft:oak` in the template pools `village/plains/trees`,
+  `village/plains/decor` and `village/plains/zombie/decor`. No other structure places one of the 15.
+- **Biomes, directly**: `trees_badlands` → `oak` (wooded badlands); `trees_birch` → `birch_bees_0002` (birch forest).
+- **Biomes, through a selector**:
+  - `trees_birch_and_oak` (forest): `oak_bees_0002`, `birch_bees_0002`, `fancy_oak_bees_0002`;
+  - `birch_tall` (old growth birch forest): `birch_bees_0002`, `super_birch_bees_0002`;
+  - `trees_flower_forest`: `oak_bees_002`, `birch_bees_002`, `fancy_oak_bees_002`;
+  - `trees_plains` (plains, sunflower plains; also listed by dripstone caves and deep dark): `oak_bees_005`,
+    `fancy_oak_bees_005`, **inline**, not by placed-feature id;
+  - `trees_meadow`: `fancy_oak_bees`, `super_birch_bees`;
+  - `dark_forest_vegetation`: `oak_checked`, `fancy_oak_checked`, `birch_checked`, beside dark oak and mushrooms;
+  - `trees_water` (11 river and ocean biomes), `trees_windswept_hills`, `trees_windswept_forest`, `trees_savanna`,
+    `trees_windswept_savanna`, `trees_jungle`, `trees_sparse_jungle`, `bamboo_vegetation`: oak or fancy oak as a
+    minor part beside other species.
+
+Consequences for Phase 2:
+
+- Supplying the 15 configured features **by id** covers every path above, the inline ones included. No biome,
+  selector or structure file has to be touched for the trees themselves (spec 11.2).
+- Density (spec 11.3) is set on the biome-level **placed** features. Those made only of oak and birch are
+  `trees_birch_and_oak`, `trees_birch`, `birch_tall`, `trees_flower_forest`, `trees_plains`, `trees_meadow` and
+  `trees_badlands`. The mixed ones (`dark_forest_vegetation`, `trees_water`, the windswept, savanna and jungle
+  ones, `bamboo_vegetation`) also place species that stay vanilla until Phase 3; lowering their count now would
+  thin those too.

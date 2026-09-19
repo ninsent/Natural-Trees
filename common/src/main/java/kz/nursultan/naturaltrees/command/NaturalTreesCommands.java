@@ -21,6 +21,7 @@ import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import kz.nursultan.naturaltrees.Constants;
+import kz.nursultan.naturaltrees.treecore.TreeResult;
 import kz.nursultan.naturaltrees.worldgen.WeberPennTrunkPlacer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -36,8 +37,8 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 
 /**
- * {@code /naturaltrees place <configured_feature> [seed]} and {@code /naturaltrees grid <configured_feature> <n>}
- * (spec section 16). Permission level 2. A seed makes the tree repeatable: the feature's whole random source
+ * {@code /naturaltrees place <configured_feature> [seed]}, {@code grid <configured_feature> <n>} and
+ * {@code stats <configured_feature> [seeds]} (spec section 16). Permission level 2. A seed makes the tree repeatable: the feature's whole random source
  * starts from it, so the same seed at the same place gives the same tree.
  */
 public final class NaturalTreesCommands {
@@ -50,6 +51,10 @@ public final class NaturalTreesCommands {
     /** Crowns are at most 33 blocks wide (spec 13); trees of another kind get this spacing. */
     private static final int DEFAULT_SPACING = 34;
     private static final int MAX_GRID = 32;
+    private static final int DEFAULT_STATS_SEEDS = 1000;
+    private static final int MAX_STATS_SEEDS = 100_000;
+    private static final SimpleCommandExceptionType NOT_OURS = new SimpleCommandExceptionType(
+            Component.literal("That feature is not a minecraft:tree with the naturaltrees:weber_penn trunk placer"));
 
     private NaturalTreesCommands() {
     }
@@ -66,6 +71,14 @@ public final class NaturalTreesCommands {
                                         .executes(context -> place(context.getSource(),
                                                 ResourceKeyArgument.getConfiguredFeature(context, "feature"),
                                                 LongArgumentType.getLong(context, "seed"))))))
+                .then(Commands.literal("stats")
+                        .then(Commands.argument("feature", ResourceKeyArgument.key(Registries.CONFIGURED_FEATURE))
+                                .executes(context -> stats(context.getSource(),
+                                        ResourceKeyArgument.getConfiguredFeature(context, "feature"), DEFAULT_STATS_SEEDS))
+                                .then(Commands.argument("seeds", IntegerArgumentType.integer(1, MAX_STATS_SEEDS))
+                                        .executes(context -> stats(context.getSource(),
+                                                ResourceKeyArgument.getConfiguredFeature(context, "feature"),
+                                                IntegerArgumentType.getInteger(context, "seeds"))))))
                 .then(Commands.literal("grid")
                         .then(Commands.argument("feature", ResourceKeyArgument.key(Registries.CONFIGURED_FEATURE))
                                 .then(Commands.argument("n", IntegerArgumentType.integer(1, MAX_GRID))
@@ -120,6 +133,87 @@ public final class NaturalTreesCommands {
                 + ", " + spacing + " blocks apart toward +x"
                 + (skippedCount > 0 ? "; " + skippedCount + " positions were not loaded" : "")), true);
         return placedCount;
+    }
+
+    /** A running minimum, maximum and mean. */
+    private static final class Tally {
+        private double sum;
+        private double min = Double.MAX_VALUE;
+        private double max = -Double.MAX_VALUE;
+        private int n;
+
+        void add(double value) {
+            sum += value;
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+            n++;
+        }
+
+        String line(String name) {
+            return String.format(java.util.Locale.ROOT, "%s: %.1f (%.0f to %.0f)", name, sum / n, min, max);
+        }
+    }
+
+    /**
+     * Spec 16: averages over seeds 1 to {@code seeds} of the trees this feature would place where the player
+     * stands. Nothing is written. Each seed draws its height and its tree seed as {@code place <seed>} does,
+     * so the numbers describe real trees at this spot, obstacles included.
+     */
+    private static int stats(CommandSourceStack source, Holder.Reference<ConfiguredFeature<?, ?>> feature, int seeds)
+            throws CommandSyntaxException {
+        if (!(feature.value().config() instanceof TreeConfiguration config)
+                || !(config.trunkPlacer instanceof WeberPennTrunkPlacer placer)) {
+            throw NOT_OURS.create();
+        }
+        final ServerLevel level = source.getLevel();
+        final BlockPos origin = BlockPos.containing(source.getPosition());
+        final Tally height = new Tally(), radius = new Tally(), width = new Tally(), logs = new Tally(),
+                branches = new Tally(), tips = new Tally(), truncated = new Tally(), dropped = new Tally(),
+                leaves = new Tally(), shade = new Tally(), reach = new Tally(), budget = new Tally();
+        int capped = 0;
+        for (int seed = 1; seed <= seeds; seed++) {
+            final RandomSource random = RandomSource.create(seed);
+            final TreeResult tree = placer.simulate(level, random, placer.getTreeHeight(random), origin, config);
+            int top = 0;
+            int logCount = 0;
+            double far = 0;
+            boolean wide = false;
+            for (int i = 0; i < tree.woodCount(); i++) {
+                top = Math.max(top, tree.woodY(i) + 1);
+                logCount += tree.isBranch(i) ? 0 : 1;
+                far = Math.max(far, Math.hypot(tree.woodX(i), tree.woodZ(i)));
+                wide |= tree.woodX(i) == 1 && tree.woodY(i) == 0 && tree.woodZ(i) == 1;
+            }
+            for (int i = 0; i < tree.leafCount(); i++) {
+                top = Math.max(top, tree.leafY(i) + 1);
+                far = Math.max(far, Math.hypot(tree.leafX(i), tree.leafZ(i)));
+            }
+            height.add(top);
+            radius.add(far);
+            width.add(wide ? 2 : 1);
+            logs.add(logCount);
+            branches.add(tree.woodCount() - logCount);
+            tips.add(tree.tipCount());
+            truncated.add(tree.stemsTruncated());
+            dropped.add(tree.stemsDroppedByFaceRule() + tree.stemsDroppedWithParent());
+            leaves.add(tree.leafCount());
+            shade.add(tree.leavesDiscardedByShade());
+            reach.add(tree.leavesDiscardedByReach());
+            budget.add(tree.leavesDiscardedByBudget());
+            capped += tree.stemCapReached() ? 1 : 0;
+        }
+        final int cappedCount = capped;
+        final String id = feature.key().location().toString();
+        source.sendSuccess(() -> Component.literal(String.join("\n",
+                id + " at " + origin.getX() + " " + origin.getY() + " " + origin.getZ() + ", seeds 1 to " + seeds
+                        + ": mean (min to max)",
+                height.line("height"), radius.line("crown radius"), width.line("trunk width"),
+                logs.line("logs"), branches.line("branch blocks"), tips.line("tips"),
+                truncated.line("truncated stems"), dropped.line("dropped stems"),
+                leaves.line("leaves"), shade.line("leaves lost to self-shading"), reach.line("leaves lost to reach"),
+                budget.line("leaves lost to the budget"),
+                "trees that hit the stem cap: " + cappedCount)), false);
+        return seeds;
     }
 
     private static int spacing(ConfiguredFeature<?, ?> feature) {

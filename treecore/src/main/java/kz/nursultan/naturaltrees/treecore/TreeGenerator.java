@@ -56,6 +56,11 @@ public final class TreeGenerator {
         return result;
     }
 
+    /** The result of the latest call on this generator; valid until the next one. */
+    public TreeResult lastResult() {
+        return result;
+    }
+
     /**
      * The fallback cluster of spec 9.1: the foliage of one wood voxel, for a species that pairs the skeleton
      * foliage placer with another trunk placer. Coordinates are relative to that voxel, which is taken to

@@ -25,8 +25,13 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -51,6 +56,13 @@ public class NaturalTrees implements ModInitializer {
     public void onInitialize() {
         NaturalTreesCommon.init();
         CommandRegistrationCallback.EVENT.register((dispatcher, registries, environment) -> NaturalTreesCommands.register(dispatcher));
+
+        // Spec 11.1: the world generation pack is optional and enabled by default. Fabric looks for it under
+        // resourcepacks/<path> in the jar.
+        ResourceManagerHelper.registerBuiltinResourcePack(
+                ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, Constants.WORLDGEN_PACK),
+                FabricLoader.getInstance().getModContainer(Constants.MOD_ID).orElseThrow(),
+                Component.translatable("pack.naturaltrees.worldgen"), ResourcePackActivationType.DEFAULT_ENABLED);
 
         for (BranchBlock branch : ModBlocks.allBranches()) {
             FlammableBlockRegistry.getDefaultInstance().add(branch, LOG_IGNITE_ODDS, LOG_BURN_ODDS);

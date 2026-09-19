@@ -14,5 +14,6 @@
   "block.naturaltrees.mangrove_branch": "Mangrove Branch",
   "block.naturaltrees.stripped_mangrove_branch": "Stripped Mangrove Branch",
   "block.naturaltrees.cherry_branch": "Cherry Branch",
-  "block.naturaltrees.stripped_cherry_branch": "Stripped Cherry Branch"
+  "block.naturaltrees.stripped_cherry_branch": "Stripped Cherry Branch",
+  "pack.naturaltrees.worldgen": "Natural Trees world generation"
 }

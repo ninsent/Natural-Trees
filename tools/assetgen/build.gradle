@@ -1,6 +1,7 @@
-// Writes the repetitive per-wood resource files of the branch blocks (spec section 6) into common's resources.
-// Its output is checked in; run it again only when the wood list or a file format changes:
+// Writes the generated resource files into common's resources. Its output is checked in; run it again only when
+// the wood list, a species file or a file format changes:
 //   ./gradlew :tools:assetgen:run
+// It is a developer tool: Gson is its own dependency and reaches no mod jar.
 plugins {
     id 'application'
 }
@@ -9,10 +10,24 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
 }
 
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.11.0'
+}
+
 application {
     mainClass = 'kz.nursultan.naturaltrees.assetgen.AssetGen'
 }
 
 run {
-    args = [rootProject.file('common/src/main/resources').path]
+    // Vanilla's own data files come from the artifacts ModDevGradle prepares for :common.
+    dependsOn ':common:createMinecraftArtifacts'
+    def artifacts = project(':common').layout.buildDirectory.dir('moddev/artifacts').get().asFile
+    args = [rootProject.file('common/src/main/resources').path,
+            new File(artifacts, "vanilla-${neo_form_version}-client-extra-aka-minecraft-resources.jar").path,
+            rootProject.file('tools/viewer/src/main/resources/species').path,
+            rootProject.file('docs/measurement-packs').path]
 }

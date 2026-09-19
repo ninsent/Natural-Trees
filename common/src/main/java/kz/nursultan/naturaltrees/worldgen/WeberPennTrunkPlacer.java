@@ -86,6 +86,24 @@ public class WeberPennTrunkPlacer extends TrunkPlacer {
                                                             BiConsumer<BlockPos, BlockState> setter,
                                                             RandomSource random, int freeTreeHeight, BlockPos origin,
                                                             TreeConfiguration config) {
+        return run(level, setter, random, freeTreeHeight, origin, config, false);
+    }
+
+    /**
+     * Generates the tree this placer would place, reading the world but writing nothing, for
+     * {@code /naturaltrees stats} (spec 16). It draws from {@code random} exactly as {@link #placeTrunk} does.
+     * The result is a view of this thread's generator and is valid until the next tree.
+     */
+    public TreeResult simulate(LevelSimulatedReader level, RandomSource random, int freeTreeHeight, BlockPos origin,
+                               TreeConfiguration config) {
+        run(level, null, random, freeTreeHeight, origin, config, true);
+        return TreeGenerators.get().lastResult();
+    }
+
+    private List<FoliagePlacer.FoliageAttachment> run(LevelSimulatedReader level,
+                                                      BiConsumer<BlockPos, BlockState> setter, RandomSource random,
+                                                      int freeTreeHeight, BlockPos origin, TreeConfiguration config,
+                                                      boolean dryRun) {
         // Spec 8.1 step 1: nothing of an earlier tree may reach this tree's foliage placer.
         final FoliageHandoff handoff = FoliageHandoff.get();
         handoff.clear();
@@ -110,6 +128,9 @@ public class WeberPennTrunkPlacer extends TrunkPlacer {
 
         // Step 4.
         final TreeResult tree = TreeGenerators.get().generate(params, foliage, seed, freeTreeHeight, limits, validTreePos, validTreePos);
+        if (dryRun) {
+            return null;
+        }
 
         // Step 5: dirt under every trunk column, as vanilla trunk placers do.
         for (int i = 0; i < tree.woodCount() && tree.woodY(i) <= 0; i++) {

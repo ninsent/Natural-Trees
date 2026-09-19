@@ -42,6 +42,10 @@ public final class AssetGen {
 
     public static void main(String[] args) throws IOException {
         new AssetGen(Path.of(args[0])).run();
+        WorldgenPackGen.run(Path.of(args[0]), Path.of(args[1]), Path.of(args[2]), WorldgenPackGen.DENSITY);
+        // Spec 15: the measurements are repeated at 1.5 and 2 times the candidate density.
+        WorldgenPackGen.runDensityPack(Path.of(args[3], "density-1.5x"), Path.of(args[1]), "1.5x", WorldgenPackGen.DENSITY * 1.5);
+        WorldgenPackGen.runDensityPack(Path.of(args[3], "density-2x"), Path.of(args[1]), "2x", WorldgenPackGen.DENSITY * 2.0);
     }
 
     private void write(String path, String content) throws IOException {
@@ -188,6 +192,7 @@ public final class AssetGen {
         }
         write("data/naturaltrees/tags/item/branches.json", tag(allBranches));
         write("data/minecraft/tags/block/overworld_natural_logs.json", tag(plainBranches));
+        lang.add("  \"pack.naturaltrees.worldgen\": \"Natural Trees world generation\"");
         write("assets/naturaltrees/lang/en_us.json", lang.toString());
     }
 }

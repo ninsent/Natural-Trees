@@ -22,6 +22,8 @@ public final class Constants {
 
     public static final String MOD_ID = "naturaltrees";
     public static final String MOD_NAME = "Natural Trees";
+    /** Folder of the built-in world generation datapack under {@code resourcepacks/} (spec 11.1). */
+    public static final String WORLDGEN_PACK = "naturaltrees_worldgen";
     public static final Logger LOG = LoggerFactory.getLogger(MOD_ID);
 
     private Constants() {
