@@ -19,7 +19,7 @@ still use vanilla trees.
   Two logs stacked vertically craft into four branches. Shears toggle an arm on the face you click; an axe strips.
 - **Trees.** The mod ships a built-in datapack, *Natural Trees world generation*, that supplies vanilla's oak, fancy
   oak, birch and tall birch tree features **by their vanilla ids**, and lowers the tree count of the forests made of
-  them to about a third, because each tree is bigger. Biomes, saplings and villages keep using the same ids, so
+  them to about a quarter, because each tree is bigger. Biomes, saplings and villages keep using the same ids, so
   nothing else changes.
 - **Commands** (permission level 2): `/naturaltrees place <feature> [seed]`, `/naturaltrees grid <feature> <n>`,
   `/naturaltrees stats <feature> [seeds]`.

@@ -1,8 +1,8 @@
 {
   "trunk_placer": {
     "type": "naturaltrees:weber_penn",
-    "base_height": 9,
-    "height_rand_a": 3,
+    "base_height": 15,
+    "height_rand_a": 6,
     "height_rand_b": 0,
     "branch_provider": {
       "type": "minecraft:simple_state_provider",
@@ -11,36 +11,59 @@
       }
     },
     "shape": "conical",
-    "base_size": 0.15,
+    "base_size": 0.08,
     "attraction_up": 0.0,
     "twig_radius": 0.25,
     "pipe_exponent": 2.0,
     "trunk_width_min": 1,
     "trunk_width_max": 1,
     "trunk_leader": true,
-    "max_radius": 4,
+    "max_radius": 9,
     "foliage_margin": 3,
-    "max_tips": 8,
+    "max_tips": 48,
     "trunk": {
       "curve": 0,
       "curve_back": 0,
-      "curve_v": 6,
+      "curve_v": 4,
       "curve_res": 3,
       "base_splits": 0,
       "seg_splits": 0.0,
       "split_angle": 0,
       "split_angle_v": 0
     },
+    "roots": {
+      "count": 3,
+      "height": 1.0,
+      "spread": 1.3,
+      "depth": 1,
+      "log_share": 0.0
+    },
     "levels": [
       {
-        "branches": 9,
-        "length": 0.37,
+        "branches": 22,
+        "length": 0.4,
         "length_v": 0.03,
-        "down_angle": 95,
-        "down_angle_v": 6,
+        "down_angle": 98,
+        "down_angle_v": 4,
         "rotate": 140,
         "rotate_v": 20,
-        "curve": 10,
+        "curve": -25,
+        "curve_back": 0,
+        "curve_v": 8,
+        "curve_res": 3,
+        "seg_splits": 0.0,
+        "split_angle": 0,
+        "split_angle_v": 0
+      },
+      {
+        "branches": 3,
+        "length": 0.45,
+        "length_v": 0.1,
+        "down_angle": 60,
+        "down_angle_v": 10,
+        "rotate": -90,
+        "rotate_v": 10,
+        "curve": 0,
         "curve_back": 0,
         "curve_v": 10,
         "curve_res": 1,
@@ -52,16 +75,16 @@
   },
   "foliage_placer": {
     "type": "naturaltrees:skeleton",
-    "foliage_start": 0.0,
-    "trunk_foliage": 0.8,
-    "radius_base": 2.3,
+    "foliage_start": 0.05,
+    "trunk_foliage": 0.38,
+    "radius_base": 1.9,
     "radius_tip": 1.2,
     "radius_v": 0.08,
     "flatten": 0.6,
     "lift": 0.3,
-    "density": 0.8,
-    "smother": 4,
+    "density": 0.85,
+    "smother": 0,
     "max_distance": 4,
-    "max_leaves": 250
+    "max_leaves": 900
   }
 }

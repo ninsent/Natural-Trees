@@ -5,36 +5,52 @@
     "dirt_provider": {
       "type": "minecraft:simple_state_provider",
       "state": {
-        "Name": "minecraft:dirt"
+        "Name": "minecraft:rooted_dirt"
       }
     },
     "foliage_placer": {
       "type": "naturaltrees:skeleton",
-      "foliage_start": 0.4,
-      "trunk_foliage": 0.3,
-      "radius_base": 1.5,
-      "radius_tip": 2.3,
-      "radius_v": 0.2,
-      "flatten": 0.7,
-      "lift": 0.3,
-      "density": 0.8,
-      "smother": 3,
+      "foliage_start": 0.3,
+      "trunk_foliage": 0.6,
+      "radius_base": 1.4,
+      "radius_tip": 2.0,
+      "radius_v": 0.15,
+      "flatten": 0.75,
+      "lift": 0.35,
+      "density": 0.9,
+      "smother": 4,
       "max_distance": 5,
-      "max_leaves": 700
+      "max_leaves": 250
     },
     "foliage_provider": {
-      "type": "minecraft:simple_state_provider",
-      "state": {
-        "Name": "minecraft:oak_leaves",
-        "Properties": {
-          "distance": "7",
-          "persistent": "false",
-          "waterlogged": "false"
+      "type": "minecraft:weighted_state_provider",
+      "entries": [
+        {
+          "data": {
+            "Name": "minecraft:azalea_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "false",
+              "waterlogged": "false"
+            }
+          },
+          "weight": 3
+        },
+        {
+          "data": {
+            "Name": "minecraft:flowering_azalea_leaves",
+            "Properties": {
+              "distance": "7",
+              "persistent": "false",
+              "waterlogged": "false"
+            }
+          },
+          "weight": 1
         }
-      }
+      ]
     },
-    "force_dirt": false,
-    "ignore_vines": true,
+    "force_dirt": true,
+    "ignore_vines": false,
     "minimum_size": {
       "type": "minecraft:two_layers_feature_size",
       "limit": 1,
@@ -43,8 +59,8 @@
     },
     "trunk_placer": {
       "type": "naturaltrees:weber_penn",
-      "base_height": 9,
-      "height_rand_a": 4,
+      "base_height": 4,
+      "height_rand_a": 1,
       "height_rand_b": 0,
       "branch_provider": {
         "type": "minecraft:simple_state_provider",
@@ -53,55 +69,55 @@
         }
       },
       "shape": "hemispherical",
-      "base_size": 0.38,
-      "attraction_up": 0.3,
-      "twig_radius": 0.3,
-      "pipe_exponent": 2.0,
+      "base_size": 0.2,
+      "attraction_up": 0.2,
+      "twig_radius": 0.2,
+      "pipe_exponent": 3.0,
       "trunk_width_min": 1,
       "trunk_width_max": 1,
-      "trunk_leader": false,
-      "max_radius": 7,
+      "trunk_leader": true,
+      "max_radius": 4,
       "foliage_margin": 3,
-      "max_tips": 28,
+      "max_tips": 14,
       "trunk": {
-        "curve": 0,
+        "curve": 35,
         "curve_back": 0,
-        "curve_v": 20,
-        "curve_res": 3,
-        "base_splits": 0,
-        "seg_splits": 0.0,
-        "split_angle": 0,
-        "split_angle_v": 0
+        "curve_v": 30,
+        "curve_res": 2,
+        "base_splits": 2,
+        "seg_splits": 0,
+        "split_angle": 40,
+        "split_angle_v": 10
       },
       "roots": {
-        "count": 3,
-        "height": 1.2,
-        "spread": 1.5,
-        "depth": 2,
+        "count": 2,
+        "height": 1.0,
+        "spread": 1.0,
+        "depth": 1,
         "log_share": 0.0
       },
       "levels": [
         {
-          "branches": 7,
-          "length": 0.6,
+          "branches": 5,
+          "length": 0.8,
           "length_v": 0.1,
-          "down_angle": 62,
-          "down_angle_v": -12,
+          "down_angle": 55,
+          "down_angle_v": -10,
           "rotate": 140,
           "rotate_v": 20,
           "curve": -25,
           "curve_back": 0,
-          "curve_v": 35,
-          "curve_res": 3,
-          "seg_splits": 0.25,
+          "curve_v": 25,
+          "curve_res": 2,
+          "seg_splits": 0.2,
           "split_angle": 35,
           "split_angle_v": 10
         },
         {
-          "branches": 3,
+          "branches": 2,
           "length": 0.5,
           "length_v": 0.1,
-          "down_angle": 50,
+          "down_angle": 45,
           "down_angle_v": 15,
           "rotate": 140,
           "rotate_v": 30,

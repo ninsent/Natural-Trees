@@ -29,6 +29,8 @@ final class Stem {
     /** The stem this one is attached to: the parent of a child, the twin of a clone; -1 for the trunk. */
     int parent;
     boolean clone;
+    /** A root (spec 8.2, {@code roots}): wood only, with no tip, no foliage and no load. */
+    boolean root;
     /** Where on the parent's path this stem is attached. */
     double parentOffset;
     /** Nominal length of the whole stem; for a clone, of the original stem. */

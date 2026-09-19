@@ -86,6 +86,7 @@ final class Skeleton {
         releaseFrame();
 
         applyTipBudget();
+        addRoots();
     }
 
     static int effectiveCurveRes(StemParams sp, double length) {
@@ -355,6 +356,7 @@ final class Skeleton {
         s.level = level;
         s.parent = parent;
         s.clone = clone;
+        s.root = false;
         s.parentOffset = parentOffset;
         s.length = length;
         s.lengthMax = lengthMax;
@@ -383,6 +385,81 @@ final class Skeleton {
         }
         liveCount++;
         return s;
+    }
+
+    /**
+     * The {@code roots} object: each root leaves the lower trunk, arches outward and down to the level of the
+     * trunk's base at {@code spread} blocks from it, and goes straight down from there for {@code depth} blocks.
+     * The ground stops it wherever it meets it (spec 7.5). Roots are made after the tip budget and draw their
+     * random numbers last, so they change nothing else about the tree; they are not tips and are never removed.
+     */
+    private void addRoots() {
+        final RootParams rp = params.roots();
+        final Stem trunk = stems[0];
+        if (rp.count() == 0 || trunk.endOffset() < 2.0) {
+            return;
+        }
+        final double turn = rng.nextDouble() * 360.0;
+        for (int k = 0; k < rp.count(); k++) {
+            final double angle = StrictMath.toRadians(turn + (k + 0.5 * signedUnit()) * 360.0 / rp.count());
+            final double off = StrictMath.min(rp.height() * (0.55 + 0.45 * rng.nextDouble()), 0.8 * trunk.endOffset());
+            final double spread = rp.spread() * (0.75 + 0.25 * rng.nextDouble());
+            if (count >= MAX_STEMS) {
+                capped = true;
+                return;
+            }
+            // Where the trunk's path is at that offset.
+            int i = 1;
+            while (i < trunk.pointCount - 1 && trunk.offset[i] < off) {
+                i++;
+            }
+            final double t = (off - trunk.offset[i - 1]) / (trunk.offset[i] - trunk.offset[i - 1]);
+            final double x0 = trunk.px[i - 1] + (trunk.px[i] - trunk.px[i - 1]) * t;
+            final double y0 = trunk.py[i - 1] + (trunk.py[i] - trunk.py[i - 1]) * t;
+            final double z0 = trunk.pz[i - 1] + (trunk.pz[i] - trunk.pz[i - 1]) * t;
+            final double dx = StrictMath.cos(angle), dz = StrictMath.sin(angle);
+            final double drop = y0 - 0.5;
+
+            final Stem root = newStem(1, 0, false, off, 0.0, 0.0, 0.0, 0);
+            // A root is not a tip and not an attachment: it takes no part in the budget or in the pipe model.
+            root.root = true;
+            unlinkLast(trunk, root);
+            double length = 0.0;
+            root.addPoint(x0, y0, z0, 0.0);
+            // An arch: out first, then down, as a stilt or buttress root stands.
+            final double x1 = x0 + dx * 0.6 * spread, y1 = y0 - 0.35 * drop, z1 = z0 + dz * 0.6 * spread;
+            length += distance(x0, y0, z0, x1, y1, z1);
+            root.addPoint(x1, y1, z1, length);
+            final double x2 = x0 + dx * spread, z2 = z0 + dz * spread;
+            length += distance(x1, y1, z1, x2, 0.5, z2);
+            root.addPoint(x2, 0.5, z2, length);
+            if (rp.depth() > 0) {
+                length += rp.depth();
+                root.addPoint(x2, 0.5 - rp.depth(), z2, length);
+            }
+            root.length = length;
+        }
+    }
+
+    private static double distance(double x0, double y0, double z0, double x1, double y1, double z1) {
+        return StrictMath.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0) + (z1 - z0) * (z1 - z0));
+    }
+
+    /** Takes the stem just made out of its parent's attachments and out of the count of live stems. */
+    private void unlinkLast(Stem parent, Stem s) {
+        liveCount--;
+        parent.attachedCount--;
+        if (parent.firstAttached == s.id) {
+            parent.firstAttached = -1;
+            parent.lastAttached = -1;
+            return;
+        }
+        int a = parent.firstAttached;
+        while (stems[a].nextSibling != s.id) {
+            a = stems[a].nextSibling;
+        }
+        stems[a].nextSibling = -1;
+        parent.lastAttached = a;
     }
 
     private static void copyGrowth(Growth to, Growth from) {

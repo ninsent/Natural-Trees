@@ -111,7 +111,7 @@ in the paper's formulas is this `h − 1`.
   wood's stripped wood and into Natural Blocks after that wood's log.
 - **Q13, growing the mod's trees before the built-in datapack exists (Phase 2).** A test datapack under
   `docs/test-datapacks/phase-1/`, shipped in no jar, supplies `minecraft:oak`, `minecraft:fancy_oak` and
-  `minecraft:birch` for the Phase 1 manual tests.
+  `minecraft:birch` for the Phase 1 manual tests. *(Deleted in the cleanup of 2026-09-20; the built-in pack replaces it.)*
 - **Q14, loader hooks for stripping and flammability (spec 6.4).** `BranchBlock` in `common` holds all behaviour.
   NeoForge registers a thin subclass overriding the loader's extension methods; Fabric registers the block
   itself with a use-on-block callback and the flammable-block registry.
@@ -233,3 +233,75 @@ spec section 19 says.
 installed and their recipes collide, the recipe manager picks one; that is accepted.
 **Proposed spec change:** in section 19, the row "The stacked-logs recipe collides with guita's Branches" changes
 its response from "Detect that mod and disable the recipe" to "Accepted; no special handling."
+
+### Q31 — Size classes and density after the look session (spec 15, 11.3)
+
+*Context (2026-09-19):* the human asked for beautiful, realistic trees and allowed them to be larger than vanilla's,
+inside the hard limits (`max_radius` ≤ 14, `max_radius + foliage_margin` ≤ 16, 48 tips, 4,096 leaves, heights,
+1×1 trunks for single-sapling species, 2×2 for the others).
+*Decisions (delegated):*
+
+- The size classes of spec 15 are replaced in `ViewerTest` by medium ≤ 220 wood / 48 tips / 900 leaves / radius 9,
+  large ≤ 400 / 48 / 2,200 / 12 and giant ≤ 600 / 48 / 3,500 / 12; the small class is empty. A conscious revision on
+  the human's instruction, not a weakened test: the near-leafless, 2×2-base, trunk-top and margin checks are unchanged.
+- `WorldgenPackGen.DENSITY` goes from a third to a fifth of vanilla's count, because crowns are now 12–25 blocks wide.
+  To be judged in game; jungle (`trees_jungle` 50 → 10) and the dark forest (16 → 3) are the ones to look at first.
+- Test helpers only: `SpeciesDump` spreads its seeds over the whole height range and prints the lowest and the widest
+  leaf; `SpeciesStats` (`./gradlew :tools:viewer:speciesStats`) prints the per-species table of `phase-0-results.md`.
+
+**Proposed spec change:** `phase-0-results.md`, proposed edit 6.
+
+### Q32 — "The exact midpoint between the current and previous versions": what has no midpoint
+
+*Instruction (2026-09-19):* apply the exact midpoint values between the current (round 4) and previous (commit
+`683e2e1`) versions.
+*Decisions (delegated):* every number is the arithmetic mean. A whole-number field whose mean is a half is rounded
+toward round 4. A `shape` that changed, a level that did not exist before, and acacia's level-2 `rotate` (whose sign is
+a mode, not a magnitude) keep their round 4 value. `WorldgenPackGen.DENSITY` is treated the same way, 4/15, because it
+was changed together with the sizes. The revised size classes (Q31) are upper bounds and stay. The copy of round 4's
+species files and the script that made the blend are not in the repository (removed in the cleanup of 2026-09-20).
+
+### Q33 — Roots (spec section 22, item 5), brought into version 1 by the human
+
+*Instruction (2026-09-19):* "A distinctive feature of the swamp tree is its very large roots that protrude from the
+ground or water. If the algorithm doesn't allow you to achieve this, you'll have to change the algorithm."
+*Decisions (delegated), details in `phase-0-results.md`:*
+
+- A `roots` object in the trunk placer, not a vanilla `root_placer`: vanilla's slot moves the trunk origin and places
+  its own blocks, while these roots must be this tree's logs and branch blocks, inside `canPlace`, fellable with the tree.
+- Roots are outside the pipe model, the tip budget and the foliage, so existing species and golden hashes are untouched.
+- Thickness is data (`log_share`), because a root carries no tips for the pipe model to count.
+- **To check in game:** vanilla's `mangrove_root_placer` stays in the mangrove files (everything outside the two placers
+  is vanilla's), so a mangrove gets vanilla's prop roots under the raised trunk **and** these stilt roots from the trunk.
+  They stop at the first `mangrove_roots` block (`canPlace`). If the two together are too much, the mangrove files lower
+  `roots.count` or `roots.depth`; nothing in code changes.
+
+**Proposed spec change:** `phase-0-results.md`, proposed edit 7.
+
+### Q34 — Density per biome: denser oak and birch forests, sparser savannas (spec 11.3)
+
+*Instruction (2026-09-19):* "Slightly increase the forest density in a typical oak forest and in a birch forest (and the
+mixed forest), and slightly decrease the density in the savanna."
+*Decisions (delegated):*
+
+- `WorldgenPackGen.DENSITY_BY_FEATURE`: `trees_birch_and_oak`, `trees_birch` and `birch_tall` use 0.4 of vanilla's count
+  instead of the general 4/15: 4 trees per chunk, sometimes 5 (was 3, sometimes 4; vanilla 10, sometimes 11).
+  `trees_flower_forest` stays at 2–3: it is meant to be open.
+- The savannas cannot be thinned by a fraction, because vanilla places 1 tree per chunk (windswept: 2). `trees_savanna`
+  joins the pack (19 placed features) and both savannas get their own weighted count, 0 × 4, 1 × 5, 2 × 1: 0.7 trees
+  per chunk on average (vanilla 1.1 and 2.1; before this, 1.1 for both).
+- `WorldgenPackTest` keeps its rule "fewer trees than vanilla, never none, weights as vanilla's" for every other feature;
+  for the two savannas, whose weights must differ, it checks the same rule on the average. A conscious revision on the
+  human's instruction. The measurement packs scale the per-feature densities and do not contain the savannas,
+  whose count does not scale: the built-in pack's file applies.
+
+### Q35 — The azalea tree joins the pack (reverses part of Q21 and Q24)
+
+*Instruction (2026-09-19):* a screenshot of vanilla's azalea tree, "I think we missed this small tree with flowers".
+*Decision:* `azalea_tree` gets the mod's two placers from a new species file, `azalea.json`, as every other key: 30
+configured features. It uses oak logs, so its branch block is `naturaltrees:oak_branch`; no new block. Everything else
+in the file stays vanilla's, including the weighted leaf provider (azalea and flowering azalea leaves), `force_dirt`
+and rooted dirt, and the `root_system` feature that grows it above lush caves is not touched. `jungle_bush` stays
+vanilla: it is a bush, not a tree with a trunk. **To check in game:** the tree on its rooted-dirt column above a lush
+cave, and an azalea bush grown with bone meal. **Proposed spec change:** add `azalea_tree` to the table of 11.2.
+

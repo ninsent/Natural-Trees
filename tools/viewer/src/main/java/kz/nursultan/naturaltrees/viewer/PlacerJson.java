@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import kz.nursultan.naturaltrees.treecore.FoliageParams;
 import kz.nursultan.naturaltrees.treecore.LevelParams;
+import kz.nursultan.naturaltrees.treecore.RootParams;
 import kz.nursultan.naturaltrees.treecore.Shape;
 import kz.nursultan.naturaltrees.treecore.StemParams;
 import kz.nursultan.naturaltrees.treecore.TrunkParams;
@@ -88,6 +89,13 @@ final class PlacerJson {
             throw new IllegalArgumentException("shape: missing");
         }
         boolean leader = Boolean.TRUE.equals(o.get("trunk_leader"));
+        RootParams roots = RootParams.NONE;
+        if (o.get("roots") != null) {
+            Map<String, Object> r = object(o.get("roots"), "roots");
+            roots = new RootParams(integer(r, "count", 0), number(r, "height", RootParams.DEFAULT_HEIGHT),
+                    number(r, "spread", RootParams.DEFAULT_SPREAD), integer(r, "depth", RootParams.DEFAULT_DEPTH),
+                    number(r, "log_share", RootParams.DEFAULT_LOG_SHARE));
+        }
         return TrunkParams.builder()
                 .shape(Shape.bySerializedName((String) shape))
                 .baseSize(number(o, "base_size", null))
@@ -103,6 +111,7 @@ final class PlacerJson {
                 .trunk(stem(trunk))
                 .baseSplits(integer(trunk, "base_splits", 0))
                 .levels(levels)
+                .roots(roots)
                 .build();
     }
 

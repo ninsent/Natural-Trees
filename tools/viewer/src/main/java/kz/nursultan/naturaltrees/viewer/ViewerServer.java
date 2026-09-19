@@ -42,7 +42,7 @@ public final class ViewerServer {
     /** Species files shipped with the viewer, in menu order. */
     static final String[] SPECIES = {"oak", "fancy_oak", "birch", "tall_birch", "spruce", "pine", "mega_spruce",
         "mega_pine", "acacia", "cherry", "jungle", "mega_jungle", "swamp_oak", "mangrove", "tall_mangrove", "dark_oak",
-        "test_28_tips"};
+        "azalea", "test_28_tips"};
 
     private static final WorldRead ABOVE_GROUND = (x, y, z) -> y >= 0;
 

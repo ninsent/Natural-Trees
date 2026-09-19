@@ -144,7 +144,8 @@ class ViewerTest {
             assertEquals(VoxelBuffer.MAGIC, ByteBuffer.wrap(tree.body()).order(ByteOrder.LITTLE_ENDIAN).getInt());
 
             HttpResponse<String> bad = client.send(HttpRequest.newBuilder(URI.create(base + "/generate"))
-                    .POST(HttpRequest.BodyPublishers.ofString(request("oak", 9, 7).replace("\"base_size\": 0.4", "\"base_size\": 1.2")))
+                    // Whatever the oak's base_size is tuned to, 1.2 is outside the range of spec 8.2.
+                    .POST(HttpRequest.BodyPublishers.ofString(request("oak", 9, 7).replaceFirst("\"base_size\": [0-9.]+", "\"base_size\": 1.2")))
                     .build(), HttpResponse.BodyHandlers.ofString());
             assertEquals(400, bad.statusCode());
             assertTrue(bad.body().startsWith("base_size:"), bad.body());
@@ -159,18 +160,23 @@ class ViewerTest {
     /** Spec section 15: block counts of every shipped species stay inside the budget of its size class. */
     @Test
     void speciesStayInsideTheirSizeClassBudgets() throws Exception {
-        // name, wood voxels, tips, leaves, max_radius (the size classes of spec 15); then whether the base must be
-        // 2×2 in every seed, and whether the trunk may still be 2×2 at its top (no trunk_leader, trunk_width_min 2).
+        // name, wood voxels, tips, leaves, max_radius; then whether the base must be 2×2 in every seed, and whether the
+        // trunk may still be 2×2 at its top (no trunk_leader, trunk_width_min 2).
+        // The size classes are the revision of spec 15 proposed in phase-0-results.md ("Size classes, revised"):
+        // medium ≤220 wood/48 tips/900 leaves/radius 9; large ≤400/48/2200/12; giant ≤600/48/3500/12. The provisional
+        // classes of spec 15 (50/8/250/5, 140/14/600/8, 400/28/1200/12) could not hold a tree with log-based limbs
+        // and separate foliage masses, which is what the species are tuned for. test_28_tips keeps its old numbers.
         Object[][] budgets = {
-            {"oak", 50, 8, 250, 5, false, false}, {"birch", 50, 8, 250, 5, false, false},
-            {"spruce", 50, 8, 250, 5, false, false}, {"jungle", 50, 8, 250, 5, false, false},
-            {"swamp_oak", 50, 8, 250, 5, false, false}, {"mangrove", 50, 8, 250, 6, false, false},
-            {"fancy_oak", 140, 14, 600, 8, false, false}, {"tall_birch", 140, 14, 600, 8, false, false},
-            {"pine", 140, 14, 600, 8, false, false}, {"acacia", 140, 14, 600, 8, false, false},
-            {"cherry", 140, 14, 600, 8, false, false}, {"tall_mangrove", 140, 14, 600, 8, false, false},
-            {"dark_oak", 140, 14, 600, 8, true, true},
-            {"mega_spruce", 400, 28, 1200, 12, true, false}, {"mega_pine", 400, 28, 1200, 12, true, false},
-            {"mega_jungle", 400, 28, 1200, 12, true, true}, {"test_28_tips", 400, 28, 1200, 12, true, false}};
+            {"oak", 220, 48, 900, 9, false, false}, {"birch", 220, 48, 900, 9, false, false},
+            {"tall_birch", 220, 48, 900, 9, false, false},
+            {"pine", 220, 48, 900, 9, false, false}, {"jungle", 220, 48, 900, 9, false, false},
+            {"swamp_oak", 220, 48, 900, 9, false, false}, {"mangrove", 220, 48, 900, 9, false, false}, {"azalea", 220, 48, 900, 9, false, false},
+            // The spruce is large since round 6: 22 boughs to the ground plus roots reach 226 wood voxels.
+            {"spruce", 400, 48, 2200, 12, false, false}, {"fancy_oak", 400, 48, 2200, 12, false, false}, {"acacia", 400, 48, 2200, 12, false, false},
+            {"cherry", 400, 48, 2200, 12, false, false}, {"tall_mangrove", 400, 48, 2200, 12, false, false},
+            {"dark_oak", 400, 48, 2200, 12, true, true},
+            {"mega_spruce", 600, 48, 3500, 12, true, false}, {"mega_pine", 600, 48, 3500, 12, true, false},
+            {"mega_jungle", 600, 48, 3500, 12, true, true}, {"test_28_tips", 400, 28, 1200, 12, true, false}};
         assertEquals(ViewerServer.SPECIES.length, budgets.length, "every shipped species has a budget");
         TreeGenerator g = new TreeGenerator();
         List<String> problems = new java.util.ArrayList<>();

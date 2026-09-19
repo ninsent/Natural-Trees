@@ -36,7 +36,8 @@ Last updated: 2026-09-19
 - **Owed from Phase 1:** P1-7 (leaves persist; a cut limb's leaves decay), P1-5 (the same seed gives the same tree),
   their judgement of the look, and the Modrinth and CurseForge name reservation. The far-chunk log search is step 1
   of `docs/measurements.md`.
-- When P2-1 passes, delete `docs/test-datapacks/phase-1` (Q21): the built-in pack replaces it.
+- `docs/test-datapacks/phase-1` was deleted in the cleanup of 2026-09-20 (Q21): the built-in pack replaces it, and the
+  human's screenshots show the mod's trees generating in a fresh world without it. It held Phase 1's tree values.
 - **Phase 3, T1, T2 and T4 done, committed (`669382e`).** Twelve new species files in `tools/viewer/.../species/` (spruce,
   pine, mega_spruce, mega_pine, acacia, cherry, jungle, mega_jungle, swamp_oak, mangrove, tall_mangrove, dark_oak),
   tuned by the agent with `dumpSpecies`; all 17 species pass the 1,000-seed budget test, which now reports every
@@ -55,7 +56,35 @@ Last updated: 2026-09-19
   client-only). `BranchBlock` no longer knows the wood enum (`docs/addon-woods.md`). 84 tests pass.
   **Waiting for the human:** P4-1 to P4-3, the Mod Menu screen check, and a yes or no on the Every Compat module (Q29).
   Compatibility code for guita's Branches is not wanted (Q30, answered).
-- **Phase 0, T14 tuning.** Open until the human has judged the species in game.
+- **Phase 0, T14 tuning, round 4: the look session (2026-09-19), uncommitted.** All 16 species retuned against the
+  human's reference builds: 2–3 times taller, log limbs that fork into branch-block twigs (`twig_radius` 0.3),
+  foliage in separate masses on the outer part of the limbs, tiered spruces with a leaf spire, flat-padded pines,
+  forked acacia and cherry, an emergent mega jungle. Size classes revised in `ViewerTest` (Q31), density a fifth of
+  vanilla's, pack and measurement packs regenerated, `./gradlew build` green. Log, per-species block counts and the
+  proposed spec 15 edit are in `phase-0-results.md`. **Waiting for the human:** the look of every species in the
+  viewer and in game (test L-1 in the session report), forest density, above all jungle and dark forest.
+  **Round 5, same day:** on the human's instruction every species value is now the exact midpoint of commit `683e2e1`
+  and round 4 (rules for what has no midpoint: Q32); density 4/15 of vanilla's; pack regenerated, build green.
+  **Round 6, same day:** sizes approved by the human, shapes not. The old isometric dump distorted proportions (squat
+  trees, thick trunks); `SpeciesDump` now draws a true-proportion eye-level view. Spruces fuller, birches slender with
+  branch-block limbs, oak smaller (9–13) with a broad crown, pines with a rounded crown (the human's photos), acacia
+  dividing low into several thin stems under one flat canopy (the human's photos). Details in `phase-0-results.md`.
+  Later in round 6 the human sent photos per species: birches with a branch-block upper trunk and a tall airy crown,
+  triangular pointed spruces, cherry and acacia dividing low, a smaller veteran dark oak with buttress roots.
+  **Generator change on the human's instruction: optional `roots` (Q33)**; species without them are byte-identical
+  (golden hashes untouched), `RootsTest` added. Mangroves carry the stilt roots; the swamp oak was rebuilt with small ones.
+  **Waiting for the human:** test L-2 (session report): every species in game, the mangrove's two kinds of roots
+  together, roots at a water's edge, forest density at 4/15.
+  End of round 6: jungle trees as a winding trunk with a few side branches that each carry a flat umbrella
+  (`smother` 0), fancy oak on the dark oak's recipe, dark oak 9–13 tall, small roots on every species (large stilt
+  roots only on the mangroves), spruce moved to the large size class (226 wood voxels with its roots), birches with
+  fewer limbs and fuller foliage. Pack regenerated, `./gradlew build` green.
+  Mangroves then made small (5–7 and 6–9 tall, because vanilla's root placer already lifts them), compact and
+  almost entirely of branch blocks, on the human's photos.
+  Density per biome (Q34): oak, birch and mixed forests 0.4 of vanilla's count, savannas 0.7 trees per chunk.
+  Azalea tree added as a 17th species (Q35): a 4–5 block shrub of branch blocks under vanilla's flowering leaves.
+  Still needing the generator and NOT done (spec 22, items 10 and 11): true whorls for spruce tiers, hanging foliage,
+  2×2 main limbs.
 
 ## Blocked
 

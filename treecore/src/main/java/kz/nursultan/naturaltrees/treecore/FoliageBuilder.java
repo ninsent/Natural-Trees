@@ -106,7 +106,7 @@ final class FoliageBuilder {
         for (int id = 0; id < skeleton.count; id++) {
             final Stem s = skeleton.stems[id];
             final int n = wood.stemPathCount[id];
-            if (s.removed || n == 0) {
+            if (s.removed || s.root || n == 0) {
                 continue;
             }
             final int from = wood.stemPathStart[id];

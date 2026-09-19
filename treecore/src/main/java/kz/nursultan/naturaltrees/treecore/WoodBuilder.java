@@ -166,6 +166,10 @@ final class WoodBuilder {
             if (s.removed) {
                 continue;
             }
+            if (s.root) {
+                s.baseLoad = 0;
+                continue;
+            }
             int load = 1;
             for (int a = s.firstAttached; a >= 0; a = skeleton.stems[a].nextSibling) {
                 if (!skeleton.stems[a].removed) {
@@ -178,6 +182,12 @@ final class WoodBuilder {
         for (int i = 0; i < skeleton.count; i++) {
             final Stem s = skeleton.stems[i];
             if (s.removed) {
+                continue;
+            }
+            if (s.root) {
+                // A root carries no tips, so the pipe model has nothing to say: its thickness is data.
+                s.wideEnd = s.startOffset;
+                s.logEnd = s.startOffset + params.roots().logShare() * s.pathLength();
                 continue;
             }
             // Load only drops where a stem is attached, so each thickness ends at an attachment or at the tip.
@@ -406,12 +416,13 @@ final class WoodBuilder {
 
         stemPathCount[id] = pathCount - stemPathStart[id];
         if (truncated) {
-            truncatedStems++;
+            // The ground is what ends a root; that is not a truncation worth reporting.
+            truncatedStems += s.root ? 0 : 1;
         } else if (steps > 0) {
             stemEmittedEnd[id] = s.endOffset();
         }
         // Spec 7.3 and 7.5: the end of a stem is a tip; a truncated stem needs two voxels to keep one.
-        if (steps >= (truncated ? 2 : 1)) {
+        if (!s.root && steps >= (truncated ? 2 : 1)) {
             addTip(lastX, lastY, lastZ, s.tipRadiusOffset, lastWide);
         }
     }

@@ -1,8 +1,8 @@
 {
   "trunk_placer": {
     "type": "naturaltrees:weber_penn",
-    "base_height": 11,
-    "height_rand_a": 4,
+    "base_height": 15,
+    "height_rand_a": 6,
     "height_rand_b": 0,
     "branch_provider": {
       "type": "minecraft:simple_state_provider",
@@ -10,41 +10,64 @@
         "Name": "naturaltrees:spruce_branch"
       }
     },
-    "shape": "conical",
-    "base_size": 0.6,
-    "attraction_up": 0.0,
-    "twig_radius": 0.25,
+    "shape": "flame",
+    "base_size": 0.28,
+    "attraction_up": 0.4,
+    "twig_radius": 0.3,
     "pipe_exponent": 2.0,
     "trunk_width_min": 1,
     "trunk_width_max": 1,
     "trunk_leader": true,
-    "max_radius": 5,
-    "foliage_margin": 3,
-    "max_tips": 14,
+    "max_radius": 8,
+    "foliage_margin": 4,
+    "max_tips": 44,
     "trunk": {
       "curve": 0,
       "curve_back": 0,
-      "curve_v": 6,
-      "curve_res": 4,
+      "curve_v": 20,
+      "curve_res": 5,
       "base_splits": 0,
       "seg_splits": 0.0,
       "split_angle": 0,
       "split_angle_v": 0
     },
+    "roots": {
+      "count": 3,
+      "height": 1.2,
+      "spread": 1.5,
+      "depth": 2,
+      "log_share": 0.0
+    },
     "levels": [
       {
-        "branches": 10,
-        "length": 0.3,
-        "length_v": 0.03,
-        "down_angle": 85,
-        "down_angle_v": 6,
+        "branches": 13,
+        "length": 0.34,
+        "length_v": 0.08,
+        "down_angle": 60,
+        "down_angle_v": -25,
         "rotate": 140,
         "rotate_v": 20,
-        "curve": 8,
+        "curve": -30,
         "curve_back": 0,
-        "curve_v": 10,
+        "curve_v": 35,
+        "curve_res": 3,
+        "seg_splits": 0.2,
+        "split_angle": 40,
+        "split_angle_v": 10
+      },
+      {
+        "branches": 3,
+        "length": 0.5,
+        "length_v": 0.1,
+        "down_angle": 50,
+        "down_angle_v": 10,
+        "rotate": 140,
+        "rotate_v": 30,
+        "curve": 0,
+        "curve_back": 0,
+        "curve_v": 20,
         "curve_res": 1,
-        "seg_splits": 0.0,
+        "seg_splits": 0,
         "split_angle": 0,
         "split_angle_v": 0
       }
@@ -52,16 +75,16 @@
   },
   "foliage_placer": {
     "type": "naturaltrees:skeleton",
-    "foliage_start": 0.0,
-    "trunk_foliage": 0.36,
-    "radius_base": 2.4,
-    "radius_tip": 1.2,
-    "radius_v": 0.08,
-    "flatten": 0.6,
+    "foliage_start": 0.55,
+    "trunk_foliage": 0.25,
+    "radius_base": 1.4,
+    "radius_tip": 2.1,
+    "radius_v": 0.15,
+    "flatten": 0.65,
     "lift": 0.3,
     "density": 0.8,
-    "smother": 4,
-    "max_distance": 4,
-    "max_leaves": 600
+    "smother": 3,
+    "max_distance": 5,
+    "max_leaves": 750
   }
 }

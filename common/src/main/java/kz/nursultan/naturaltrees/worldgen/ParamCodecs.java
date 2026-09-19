@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import kz.nursultan.naturaltrees.treecore.FoliageParams;
 import kz.nursultan.naturaltrees.treecore.LevelParams;
+import kz.nursultan.naturaltrees.treecore.RootParams;
 import kz.nursultan.naturaltrees.treecore.Shape;
 import kz.nursultan.naturaltrees.treecore.StemParams;
 import kz.nursultan.naturaltrees.treecore.TrunkParams;
@@ -113,18 +114,39 @@ final class ParamCodecs {
             Codec.INT.optionalFieldOf("tip_radius_offset", 0).forGetter(RawLevel::tipRadiusOffset)
     ).apply(i, RawLevel::new)).flatXmap(raw -> checked(raw::build), p -> DataResult.success(RawLevel.of(p))).codec();
 
+    private record RawRoots(int count, double height, double spread, int depth, double logShare) {
+        RootParams build() {
+            return new RootParams(count, height, spread, depth, logShare);
+        }
+
+        static RawRoots of(RootParams p) {
+            return new RawRoots(p.count(), p.height(), p.spread(), p.depth(), p.logShare());
+        }
+    }
+
+    /** The optional {@code roots} object of the trunk placer. */
+    private static final Codec<RootParams> ROOTS = RecordCodecBuilder.<RawRoots>mapCodec(i -> i.group(
+            Codec.INT.optionalFieldOf("count", 0).forGetter(RawRoots::count),
+            number("height", RootParams.DEFAULT_HEIGHT).forGetter(RawRoots::height),
+            number("spread", RootParams.DEFAULT_SPREAD).forGetter(RawRoots::spread),
+            Codec.INT.optionalFieldOf("depth", RootParams.DEFAULT_DEPTH).forGetter(RawRoots::depth),
+            number("log_share", RootParams.DEFAULT_LOG_SHARE).forGetter(RawRoots::logShare)
+    ).apply(i, RawRoots::new)).flatXmap(raw -> checked(raw::build), p -> DataResult.success(RawRoots.of(p))).codec();
+
     private record RawTrunk(Shape shape, double baseSize, double attractionUp, double twigRadius, double pipeExponent,
                             int trunkWidthMin, int trunkWidthMax, boolean trunkLeader, int maxRadius,
-                            int foliageMargin, int maxTips, TrunkStem trunk, List<LevelParams> levels) {
+                            int foliageMargin, int maxTips, TrunkStem trunk, List<LevelParams> levels,
+                            RootParams roots) {
         TrunkParams build() {
             return new TrunkParams(shape, baseSize, attractionUp, twigRadius, pipeExponent, trunkWidthMin,
-                    trunkWidthMax, trunkLeader, maxRadius, foliageMargin, maxTips, trunk.stem(), trunk.baseSplits(), levels);
+                    trunkWidthMax, trunkLeader, maxRadius, foliageMargin, maxTips, trunk.stem(), trunk.baseSplits(), levels,
+                    roots);
         }
 
         static RawTrunk of(TrunkParams p) {
             return new RawTrunk(p.shape(), p.baseSize(), p.attractionUp(), p.twigRadius(), p.pipeExponent(),
                     p.trunkWidthMin(), p.trunkWidthMax(), p.trunkLeader(), p.maxRadius(), p.foliageMargin(),
-                    p.maxTips(), new TrunkStem(p.trunk(), p.baseSplits()), p.levels());
+                    p.maxTips(), new TrunkStem(p.trunk(), p.baseSplits()), p.levels(), p.roots());
         }
     }
 
@@ -142,7 +164,8 @@ final class ParamCodecs {
             Codec.INT.optionalFieldOf("foliage_margin", TrunkParams.DEFAULT_FOLIAGE_MARGIN).forGetter(RawTrunk::foliageMargin),
             Codec.INT.fieldOf("max_tips").forGetter(RawTrunk::maxTips),
             TRUNK_STEM.fieldOf("trunk").forGetter(RawTrunk::trunk),
-            LEVEL.listOf().fieldOf("levels").forGetter(RawTrunk::levels)
+            LEVEL.listOf().fieldOf("levels").forGetter(RawTrunk::levels),
+            ROOTS.optionalFieldOf("roots", RootParams.NONE).forGetter(RawTrunk::roots)
     ).apply(i, RawTrunk::new)).flatXmap(raw -> checked(raw::build), p -> DataResult.success(RawTrunk.of(p)));
 
     private record RawFoliage(double foliageStart, double trunkFoliage, double radiusBase, double radiusTip,

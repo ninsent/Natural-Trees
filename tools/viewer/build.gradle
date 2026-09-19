@@ -50,3 +50,11 @@ tasks.register('dumpSpecies', JavaExec) {
     args = [project.findProperty('species') ?: 'oak', project.findProperty('seeds') ?: '8',
             layout.buildDirectory.dir('tree-dumps').get().asFile.path]
 }
+
+// Block counts of every species over 1,000 seeds, as a Markdown table: ./gradlew :tools:viewer:speciesStats
+tasks.register('speciesStats', JavaExec) {
+    group = 'verification'
+    description = 'Prints wood, tips and leaves per tree for every species file.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kz.nursultan.naturaltrees.viewer.SpeciesStats'
+}

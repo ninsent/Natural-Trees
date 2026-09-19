@@ -4,8 +4,9 @@ One table, one reference machine. **Working ceiling:** 15 % more total chunk tim
 mean frame time than vanilla. Above it: lower `count` first, then `smother`, then `max_leaves`, then `max_tips`, and
 measure again. The figures are published in the mod description.
 
-Status: **not measured yet.** The candidate density is a third of vanilla's count (3–4 trees per chunk where vanilla
-places 10–11), set in `tools/assetgen` (`WorldgenPackGen.DENSITY`).
+Status: **not measured yet.** The candidate density is 4/15 of vanilla's count (2–3 trees per chunk where vanilla
+places 10–11; it was a third before the species were enlarged; oak and birch forests use 0.4 and the savannas their own
+count, questions.md Q34), set in `tools/assetgen` (`WorldgenPackGen.DENSITY`).
 
 ## Reference machine
 

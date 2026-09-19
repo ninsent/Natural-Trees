@@ -24,7 +24,7 @@ import java.util.List;
 public record TrunkParams(Shape shape, double baseSize, double attractionUp, double twigRadius,
                           double pipeExponent, int trunkWidthMin, int trunkWidthMax, boolean trunkLeader,
                           int maxRadius, int foliageMargin, int maxTips, StemParams trunk, int baseSplits,
-                          List<LevelParams> levels) {
+                          List<LevelParams> levels, RootParams roots) {
 
     public static final double DEFAULT_ATTRACTION_UP = 0.0;
     public static final double DEFAULT_TWIG_RADIUS = 0.25;
@@ -63,6 +63,18 @@ public record TrunkParams(Shape shape, double baseSize, double attractionUp, dou
             throw new IllegalArgumentException("levels: " + levels.size() + " entries, expected 1 to 3");
         }
         levels = List.copyOf(levels);
+        Checks.notNull("roots", roots);
+        if (roots.count() > 0 && roots.spread() > maxRadius) {
+            throw new IllegalArgumentException("roots.spread: " + roots.spread() + " is greater than max_radius " + maxRadius);
+        }
+    }
+
+    /** A species without roots. */
+    public TrunkParams(Shape shape, double baseSize, double attractionUp, double twigRadius, double pipeExponent,
+                       int trunkWidthMin, int trunkWidthMax, boolean trunkLeader, int maxRadius, int foliageMargin,
+                       int maxTips, StemParams trunk, int baseSplits, List<LevelParams> levels) {
+        this(shape, baseSize, attractionUp, twigRadius, pipeExponent, trunkWidthMin, trunkWidthMax, trunkLeader,
+                maxRadius, foliageMargin, maxTips, trunk, baseSplits, levels, RootParams.NONE);
     }
 
     /** A builder preset with the defaults of spec 8.2. Required fields have no default and must be set. */
@@ -87,6 +99,7 @@ public record TrunkParams(Shape shape, double baseSize, double attractionUp, dou
         b.trunk = trunk;
         b.baseSplits = baseSplits;
         b.levels = levels;
+        b.roots = roots;
         return b;
     }
 
@@ -105,6 +118,7 @@ public record TrunkParams(Shape shape, double baseSize, double attractionUp, dou
         private StemParams trunk;
         private int baseSplits;
         private List<LevelParams> levels;
+        private RootParams roots = RootParams.NONE;
 
         private Builder() {
         }
@@ -123,11 +137,12 @@ public record TrunkParams(Shape shape, double baseSize, double attractionUp, dou
         public Builder baseSplits(int v) { baseSplits = v; return this; }
         public Builder levels(List<LevelParams> v) { levels = v; return this; }
         public Builder levels(LevelParams... v) { levels = List.of(v); return this; }
+        public Builder roots(RootParams v) { roots = v; return this; }
 
         public TrunkParams build() {
             return new TrunkParams(shape, Checks.notNull("base_size", baseSize), attractionUp, twigRadius,
                     pipeExponent, trunkWidthMin, trunkWidthMax, trunkLeader, Checks.notNull("max_radius", maxRadius),
-                    foliageMargin, Checks.notNull("max_tips", maxTips), trunk, baseSplits, levels);
+                    foliageMargin, Checks.notNull("max_tips", maxTips), trunk, baseSplits, levels, roots);
         }
     }
 }

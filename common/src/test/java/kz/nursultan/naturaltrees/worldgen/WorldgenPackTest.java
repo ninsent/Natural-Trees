@@ -82,13 +82,16 @@ class WorldgenPackTest {
         if (key.startsWith("jungle_tree")) {
             return "jungle";
         }
+        if (key.equals("azalea_tree")) {
+            return "azalea";
+        }
         return key.equals("mega_jungle_tree") ? "mega_jungle" : key;
     }
 
     @Test
     void configuredFeaturesAreVanillaExceptTheTwoPlacers() throws IOException {
         List<Path> files = files("configured_feature");
-        assertEquals(29, files.size(), "the 15 keys of spec 11.2 and the 14 of Phase 3");
+        assertEquals(30, files.size(), "the 15 keys of spec 11.2, the 14 of Phase 3 and azalea_tree (questions.md Q35)");
         try (ZipFile jar = vanilla()) {
             for (Path file : files) {
                 String key = file.getFileName().toString().replace(".json", "");
@@ -112,7 +115,7 @@ class WorldgenPackTest {
     @Test
     void placedFeaturesAreVanillaExceptTheCount() throws IOException {
         List<Path> files = files("placed_feature");
-        assertEquals(18, files.size());
+        assertEquals(19, files.size());
         try (ZipFile jar = vanilla()) {
             for (Path file : files) {
                 String key = file.getFileName().toString().replace(".json", "");
@@ -132,6 +135,11 @@ class WorldgenPackTest {
                         int mineCount = mine.get("count").getAsInt();
                         assertTrue(mineCount >= 1 && mineCount < vanillas.get("count").getAsInt(), key + ": fewer trees than vanilla, never none");
                         fewer = true;
+                    } else if (key.equals("trees_savanna") || key.equals("trees_windswept_savanna")) {
+                        // questions.md Q34: vanilla's 1 tree per chunk cannot be thinned by a fraction, so the savannas
+                        // have their own weighted list. The rule is the same: fewer trees than vanilla, never none.
+                        assertTrue(mean(mine) > 0.0 && mean(mine) < mean(vanillas), key + ": fewer trees than vanilla, never none");
+                        fewer = true;
                     } else {
                         JsonArray a = mine.getAsJsonObject("count").getAsJsonArray("distribution");
                         JsonArray b = vanillas.getAsJsonObject("count").getAsJsonArray("distribution");
@@ -149,5 +157,16 @@ class WorldgenPackTest {
                 assertEquals((JsonElement) theirs, ours, key + ": everything else is vanilla's");
             }
         }
+    }
+
+    /** Trees per chunk of a weighted {@code minecraft:count}, on average. */
+    private static double mean(JsonObject modifier) {
+        double sum = 0.0, weights = 0.0;
+        for (JsonElement entry : modifier.getAsJsonObject("count").getAsJsonArray("distribution")) {
+            JsonObject o = entry.getAsJsonObject();
+            sum += o.get("data").getAsDouble() * o.get("weight").getAsDouble();
+            weights += o.get("weight").getAsDouble();
+        }
+        return sum / weights;
     }
 }
