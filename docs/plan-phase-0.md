@@ -3,8 +3,8 @@
 Spec section 18, Phase 0: `treecore` complete (skeleton, tip budget, pipe model, both rasterisers and the
 2×2 section, arms, truncation, foliage), the viewer, and the species oak, fancy oak and birch.
 
-**Status: approved 2026-09-19, in progress.** Done: T1–T10. Open: T11 (JMH and allocation check only; a rough
-timing already shows about 0.07 ms for a large tree), T12, T13, T14. See `progress.md`.
+**Status: approved 2026-09-19, in progress.** Done: T1–T13 (species are first drafts). Waiting for the human:
+manual tests P0-1 to P0-4. Then T14 (tuning). See `progress.md` and `phase-0-results.md`.
 
 ## Exit criteria (spec 18) and who judges them
 

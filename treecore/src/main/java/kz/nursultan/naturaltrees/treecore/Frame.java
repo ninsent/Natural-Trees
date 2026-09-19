@@ -27,6 +27,42 @@ final class Frame {
     double yx, yy, yz;
     double zx, zy, zz;
 
+    // Sine and cosine of the last angle given to setAngle.
+    private double sin;
+    private double cos;
+
+    /**
+     * Sine and cosine of an angle in degrees. The angle is first brought to within 45 degrees of a multiple
+     * of 90, which is exact in degrees, so the results are exact at the multiples of 90 and StrictMath never
+     * sees an argument beyond pi/4, where its argument reduction would allocate a temporary array (spec 7.8).
+     */
+    private void setAngle(double degrees) {
+        double d = degrees - 360.0 * StrictMath.floor(degrees / 360.0 + 0.5);
+        final int quarter = (int) StrictMath.floor(d / 90.0 + 0.5);
+        d -= 90.0 * quarter;
+        final double r = StrictMath.toRadians(d);
+        final double s = StrictMath.sin(r);
+        final double c = StrictMath.cos(r);
+        switch (quarter & 3) {
+            case 0 -> {
+                sin = s;
+                cos = c;
+            }
+            case 1 -> {
+                sin = c;
+                cos = -s;
+            }
+            case 2 -> {
+                sin = -s;
+                cos = -c;
+            }
+            default -> {
+                sin = -c;
+                cos = s;
+            }
+        }
+    }
+
     /** The trunk's frame: z up, x east, y north. */
     Frame setUpright() {
         xx = 1; xy = 0; xz = 0;
@@ -44,9 +80,9 @@ final class Frame {
 
     /** Rotates about the local x-axis: the stem direction turns toward the negative local y-axis. */
     void rotateX(double degrees) {
-        final double a = StrictMath.toRadians(degrees);
-        final double c = StrictMath.cos(a);
-        final double s = StrictMath.sin(a);
+        setAngle(degrees);
+        final double c = cos;
+        final double s = sin;
         final double nyx = yx * c + zx * s, nyy = yy * c + zy * s, nyz = yz * c + zz * s;
         final double nzx = zx * c - yx * s, nzy = zy * c - yy * s, nzz = zz * c - yz * s;
         yx = nyx; yy = nyy; yz = nyz;
@@ -55,9 +91,9 @@ final class Frame {
 
     /** Rotates about the local z-axis, the stem's own direction. */
     void rotateZ(double degrees) {
-        final double a = StrictMath.toRadians(degrees);
-        final double c = StrictMath.cos(a);
-        final double s = StrictMath.sin(a);
+        setAngle(degrees);
+        final double c = cos;
+        final double s = sin;
         final double nxx = xx * c + yx * s, nxy = xy * c + yy * s, nxz = xz * c + yz * s;
         final double nyx = yx * c - xx * s, nyy = yy * c - xy * s, nyz = yz * c - xz * s;
         xx = nxx; xy = nxy; xz = nxz;
@@ -66,9 +102,9 @@ final class Frame {
 
     /** Rotates the whole frame about the world's vertical axis, the axis "parallel to the tree" of section 4.2. */
     void rotateWorldUp(double degrees) {
-        final double a = StrictMath.toRadians(degrees);
-        final double c = StrictMath.cos(a);
-        final double s = StrictMath.sin(a);
+        setAngle(degrees);
+        final double c = cos;
+        final double s = sin;
         double t = xx * c + xz * s; xz = xz * c - xx * s; xx = t;
         t = yx * c + yz * s; yz = yz * c - yx * s; yx = t;
         t = zx * c + zz * s; zz = zz * c - zx * s; zx = t;

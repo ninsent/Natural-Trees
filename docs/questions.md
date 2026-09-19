@@ -34,7 +34,7 @@ spec names (`canPlace`, `max_radius`, the chunk area, the budgets).
 ### Q4 — "A stem shorter than 2 voxels is not generated" (spec 7.3): measured how?
 
 *Asked:* the rule runs on the skeleton, before rasterisation, so a voxel count does not exist yet.
-*Answer (2026-09-19):* the human delegated Q4–Q8: "just do whatever is best".
+*Answer (2026-09-19):* the human delegated Q4–Q8 ("just do whatever is best") and later accepted the decisions below.
 *Decision:* the skeleton length in blocks is the measure. A stem shorter than 2.0 blocks is not generated.
 The same length drives the `curve_res` cap: effective `curve_res = max(1, min(curve_res, floor(length / 2)))`.
 
@@ -79,7 +79,7 @@ limit of section 13 and the map size of 7.8 true for every tree, not only for ge
 *Asked:* `branches` up to 32 on three levels, or `seg_splits` 2 with `curve_res` 8, describe tens of thousands
 of stems before the tip budget cuts them to `max_tips`. The spec sets no limit, so one datapack file could
 stall world generation.
-*Decision (delegated, 2026-09-19):* the skeleton stops creating stems at 2,048 (`Skeleton.MAX_STEMS`). The cap
+*Decision (delegated; accepted by the human 2026-09-19):* the skeleton stops creating stems at 2,048 (`Skeleton.MAX_STEMS`). The cap
 is deterministic, is far above anything a sane species reaches (the 28-tip test species generates about 45),
 and is reported by `TreeResult.stemCapReached()` so that `/naturaltrees stats` can show it.
 **Proposed spec change:** mention the cap in 7.3.
@@ -88,7 +88,7 @@ and is reported by `TreeResult.stemCapReached()` so that `/naturaltrees stats` c
 
 *Asked:* spec 7.4 says what happens when an extra column is blocked at the base (the whole trunk becomes
 1×1) but not higher up, for example where a 2×2 trunk grows past an overhang.
-*Decision (delegated):* the centreline column decides. If it is blocked the trunk is truncated there, as any
+*Decision (delegated; accepted by the human 2026-09-19):* the centreline column decides. If it is blocked the trunk is truncated there, as any
 stem (7.5). A blocked extra voxel is simply not placed and the trunk continues; the trunk never floats,
 because the centreline column is continuous.
 
@@ -96,7 +96,7 @@ because the centreline column is continuous.
 
 *Asked:* follows from Q3. A trunk of free height `h` must fill exactly `h` voxels, as a vanilla trunk does,
 because that is the space vanilla checked.
-*Decision (delegated):* the skeleton runs between voxel centres. The trunk starts at the centre of the origin
+*Decision (delegated; accepted by the human 2026-09-19):* the skeleton runs between voxel centres. The trunk starts at the centre of the origin
 block and its length along the curve is `h − 1`, so a straight trunk fills `y = 0 … h − 1`. `length_trunk`
 in the paper's formulas is this `h − 1`.
 

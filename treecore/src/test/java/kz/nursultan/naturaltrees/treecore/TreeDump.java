@@ -33,7 +33,7 @@ import javax.imageio.ImageIO;
  * <p>Run with {@code ./gradlew :treecore:dumpTrees -Pspecies=oak -Pseeds=8 -Pheight=9}; the files land in
  * {@code treecore/build/tree-dumps}.
  */
-final class TreeDump {
+public final class TreeDump {
 
     private static final Color LOG = new Color(0x6B4A2B);
     private static final Color BRANCH = new Color(0x9A7044);
@@ -66,7 +66,7 @@ final class TreeDump {
     }
 
     /** An isometric drawing seen from the +x, +z side and above. Branch blocks are drawn as small cubes. */
-    static BufferedImage isometric(TreeResult r, boolean withLeaves, int unit) {
+    public static BufferedImage isometric(TreeResult r, boolean withLeaves, int unit) {
         List<Voxel> all = voxels(r, withLeaves);
         all.sort(Comparator.comparingInt((Voxel v) -> v.x + v.y + v.z).thenComparingInt(v -> v.y));
         int span = 2 * VoxelMap.RADIUS + 2;
@@ -133,7 +133,7 @@ final class TreeDump {
     }
 
     /** Side (x, y), front (z, y) and top (x, z) projections next to each other; tips are red. */
-    static BufferedImage projections(TreeResult r, int unit) {
+    public static BufferedImage projections(TreeResult r, int unit) {
         int span = 2 * VoxelMap.RADIUS + 1;
         int topY = 8;
         for (int i = 0; i < r.woodCount(); i++) {
@@ -178,7 +178,7 @@ final class TreeDump {
     }
 
     /** Horizontal slices as text, top layer first: {@code #} log, {@code +} branch, {@code o} leaf. */
-    static String slices(TreeResult r) {
+    public static String slices(TreeResult r) {
         int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
         List<Voxel> all = voxels(r, true);
         for (Voxel v : all) {
@@ -207,7 +207,7 @@ final class TreeDump {
     }
 
     /** Several trees side by side: each column is one seed, with and without leaves. */
-    static BufferedImage grid(List<BufferedImage> withLeaves, List<BufferedImage> woodOnly) {
+    public static BufferedImage grid(List<BufferedImage> withLeaves, List<BufferedImage> woodOnly) {
         int w = 0, h = 0;
         for (BufferedImage i : withLeaves) {
             w = Math.max(w, i.getWidth());

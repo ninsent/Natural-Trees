@@ -13,13 +13,23 @@ Last updated: 2026-09-19
     one child per face, predicate order with one world read per position.
   - T8 `FoliageBuilder`: spec 7.6 steps 1–7. T9 determinism, independence, golden hashes.
   - T10 `TreeDump` test helper and `./gradlew :treecore:dumpTrees -Pspecies=oak|large -Pseeds=N -Pheight=H`.
-  - 60 tests pass; `./gradlew build` passes with `treecore` compiled into both loader jars.
+  - 65 tests pass (60 in `treecore`, 5 in `tools/viewer`); `./gradlew build` passes with `treecore` compiled into both loader jars.
+- **Phase 0, T11–T12** (uncommitted):
+  - T11 JMH benchmark (`./gradlew :treecore:jmh`): small 7 µs, medium 18 µs, large 58 µs per tree, 0 bytes
+    allocated per tree. Details in `phase-0-results.md`.
+  - T12 species drafts as JSON in `tools/viewer/src/main/resources/species/`: oak, fancy_oak, birch,
+    tall_birch, test_28_tips. They are the exact `trunk_placer` and `foliage_placer` objects for Phase 2.
+    All stay inside their section 15 budgets over 1,000 seeds (`ViewerTest`).
+    `./gradlew :tools:viewer:dumpSpecies -Pspecies=birch -Pseeds=8` draws one to PNG.
 - Decisions Q1–Q11 in `questions.md`; paper readings 1–17 in `paper-notes.md`, all chosen.
 
 ## In progress
 
-- **Phase 0.** Next: T12 species as JSON (oak, fancy oak, birch, tall birch, 28-tip test species),
-  T13 viewer (`tools/viewer`), T11 JMH benchmark, T14 tuning with the human.
+- **Phase 0, T13 viewer: written and checked by the agent in a browser** (single tree, load overlay on the
+  28-tip species, 3×3 seed grid, no console errors). Waiting for the human to run manual tests P0-1 to P0-4
+  (`plan-phase-0.md`). Start it with `./gradlew :tools:viewer:run` and open http://localhost:8765/.
+- **T14 tuning** with the human follows the manual tests. Known starting points: the birch crown is rounder
+  than a birch should be; the trunk top can show bare; the lowest limbs carry heavy clusters.
 
 ## Blocked
 

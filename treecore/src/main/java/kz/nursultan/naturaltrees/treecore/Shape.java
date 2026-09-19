@@ -36,9 +36,9 @@ public enum Shape {
             case CONICAL:
                 return 0.2 + 0.8 * r;
             case SPHERICAL:
-                return 0.2 + 0.8 * StrictMath.sin(StrictMath.PI * r);
+                return 0.2 + 0.8 * sinQuarterTurns(r <= 0.5 ? 2.0 * r : 2.0 * (1.0 - r));
             case HEMISPHERICAL:
-                return 0.2 + 0.8 * StrictMath.sin(0.5 * StrictMath.PI * r);
+                return 0.2 + 0.8 * sinQuarterTurns(r);
             case CYLINDRICAL:
                 return 1.0;
             case TAPERED_CYLINDRICAL:
@@ -52,6 +52,14 @@ public enum Shape {
             default:
                 throw new AssertionError(this);
         }
+    }
+
+    /**
+     * {@code sin(q × π/2)} for q in [0, 1]. StrictMath is only ever given an argument up to π/4, beyond which
+     * its argument reduction would allocate a temporary array (spec 7.8).
+     */
+    private static double sinQuarterTurns(double q) {
+        return q <= 0.5 ? StrictMath.sin(0.5 * StrictMath.PI * q) : StrictMath.cos(0.5 * StrictMath.PI * (1.0 - q));
     }
 
     /** The name used in species files, for example {@code tapered_cylindrical}. */

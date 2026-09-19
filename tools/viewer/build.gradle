@@ -1,0 +1,52 @@
+// The tuning tool of spec section 17: treecore behind the JDK's HttpServer, with a static Three.js page.
+// A developer tool: it is not part of any mod jar and has no dependencies besides treecore.
+plugins {
+    id 'application'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+}
+
+repositories {
+    mavenCentral()
+}
+
+evaluationDependsOn(':treecore')
+
+dependencies {
+    implementation project(':treecore')
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // The tree drawing helper of treecore's tests, for drawing species files.
+    testImplementation project(':treecore').sourceSets.test.output
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'kz.nursultan.naturaltrees.viewer.ViewerServer'
+}
+
+run {
+    args = [project.findProperty('port') ?: '8765']
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty 'java.awt.headless', 'true'
+}
+
+// Draws a species file to PNG: ./gradlew :tools:viewer:dumpSpecies -Pspecies=oak -Pseeds=8
+tasks.register('dumpSpecies', JavaExec) {
+    group = 'verification'
+    description = 'Draws the trees of a species file to PNG files in build/tree-dumps.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'kz.nursultan.naturaltrees.viewer.SpeciesDump'
+    systemProperty 'java.awt.headless', 'true'
+    args = [project.findProperty('species') ?: 'oak', project.findProperty('seeds') ?: '8',
+            layout.buildDirectory.dir('tree-dumps').get().asFile.path]
+}

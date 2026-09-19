@@ -11,7 +11,17 @@ repositories {
     mavenCentral()
 }
 
+// JMH benchmarks live in their own source set, so that nothing of JMH reaches the library or the mod jars.
+sourceSets {
+    jmh {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
 dependencies {
+    jmhImplementation 'org.openjdk.jmh:jmh-core:1.37'
+    jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
     testImplementation platform('org.junit:junit-bom:5.11.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -50,4 +60,13 @@ configurations {
 
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
+}
+
+// Spec section 15: ./gradlew :treecore:jmh   (add -Pjmh.args='...' to pass JMH options)
+tasks.register('jmh', JavaExec) {
+    group = 'verification'
+    description = 'Runs the JMH benchmarks of the generator with the GC profiler.'
+    classpath = sourceSets.jmh.runtimeClasspath
+    mainClass = 'org.openjdk.jmh.Main'
+    args = (project.findProperty('jmh.args') ?: '-prof gc').toString().split(' ').toList()
 }
