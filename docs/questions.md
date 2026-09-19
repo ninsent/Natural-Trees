@@ -103,3 +103,17 @@ because that is the space vanilla checked.
 block and its length along the curve is `h − 1`, so a straight trunk fills `y = 0 … h − 1`. `length_trunk`
 in the paper's formulas is this `h − 1`.
 
+### Q12–Q15 — gaps found while planning Phase 1
+
+*Decisions (delegated, 2026-09-19), details in `plan-phase-1.md`:*
+
+- **Q12, creative tab (spec 6.1).** No new tab: each branch goes into vanilla's Building Blocks tab after that
+  wood's stripped wood and into Natural Blocks after that wood's log.
+- **Q13, growing the mod's trees before the built-in datapack exists (Phase 2).** A test datapack under
+  `docs/test-datapacks/phase-1/`, shipped in no jar, supplies `minecraft:oak`, `minecraft:fancy_oak` and
+  `minecraft:birch` for the Phase 1 manual tests.
+- **Q14, loader hooks for stripping and flammability (spec 6.4).** `BranchBlock` in `common` holds all behaviour.
+  NeoForge registers a thin subclass overriding the loader's extension methods; Fabric registers the block
+  itself with a use-on-block callback and the flammable-block registry.
+- **Q15, fuel (spec 6.5).** NeoForge's `neoforge:furnace_fuels` data map and Fabric's `FuelRegistry`.
+

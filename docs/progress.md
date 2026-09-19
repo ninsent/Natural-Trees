@@ -25,11 +25,12 @@ Last updated: 2026-09-19
 
 ## In progress
 
-- **Phase 0, T13 viewer: written and checked by the agent in a browser** (single tree, load overlay on the
-  28-tip species, 3×3 seed grid, no console errors). Waiting for the human to run manual tests P0-1 to P0-4
-  (`plan-phase-0.md`). Start it with `./gradlew :tools:viewer:run` and open http://localhost:8765/.
-- **T14 tuning** with the human follows the manual tests. Known starting points: the birch crown is rounder
-  than a birch should be; the trunk top can show bare; the lowest limbs carry heavy clusters.
+- **Phase 0, T14 tuning.** Three rounds done by the agent (log in `phase-0-results.md`). Waiting for the human:
+  manual tests P0-2 (seed grids), P0-3 (the outsider check) and P0-4 (side view of the 28-tip species with the
+  load overlay). P0-1 passed (the human's screenshot, 2026-09-19). Viewer: `./gradlew :tools:viewer:run`.
+- **Phase 1 groundwork.** `docs/assumptions.md`: spec section 20 items 1–3 and 5–14 read in the 1.21.1
+  sources, all true (item 4 is due before Phase 2). `docs/plan-phase-1.md` is written and **waits for the
+  human's approval**. No Phase 1 code exists.
 
 ## Blocked
 

@@ -42,6 +42,7 @@ trunk tip is never on the 2×2 section, so it always narrows to 1×1.
 | 1 | The example oak of spec 10 keeps about 4 limbs at height 9: with a spherical crown the top and bottom limbs come out under 2 blocks and are dropped (spec 7.3). | Oak uses `hemispherical`, `length` 0.55, `base_size` 0.4, `trunk_foliage` 0.3. |
 | 2 | Tall birch looked like a lollipop: a round ball on a long bare pole. | Both birches: shorter and more upright limbs (`down_angle` 38–40), lower crown base, narrower and taller sleeves (`radius_tip` 1.6, `flatten` 1.2, `lift` 0.1), `max_radius` 4. |
 | 2 | Small birch, 2 of 6 seeds: the whole trunk was branch blocks. With `trunk_leader` a tree with three tips or fewer has a load below 4 everywhere. | Generator rule, recorded under Q6: with `trunk_leader` the bare part of the trunk is never thinner than a log. Small birch `length` 0.45 so that more limbs survive the 2-block rule. |
+| 3 | Oak at height 7: the lowest limbs went out level and their foliage hung almost to the ground, so the tree read as a bush. | Oak: `base_size` 0.45, `down_angle` 50 with `down_angle_v` −20, `foliage_start` 0.5, `lift` 0.4. Fancy oak: `down_angle` 58 with `down_angle_v` −27, `lift` 0.4. |
 
 Waiting for the human's view in the viewer (manual tests P0-2 and P0-3) before further rounds.
 
